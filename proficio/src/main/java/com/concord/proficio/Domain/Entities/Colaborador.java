@@ -16,6 +16,8 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +28,7 @@ public class Colaborador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_colaborador")
-	private Integer id;
+	private Long id;
 
 	@Column(name = "cpf", length = 15, unique = true)
 	private String cpf;
@@ -59,9 +61,12 @@ public class Colaborador {
 	@Column(name = "capa")
 	private byte[] capa;
 
+	@CreatedDate
 	@Column(name = "criado_em", nullable = false)
 	private LocalDateTime criadoEm;
 
+
+	@LastModifiedDate
 	@Column(name = "atualizado_em")
 	private LocalDateTime atualizadoEm;
 }
