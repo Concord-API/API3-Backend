@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Model;
+package com.concord.proficio.Domain.Entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

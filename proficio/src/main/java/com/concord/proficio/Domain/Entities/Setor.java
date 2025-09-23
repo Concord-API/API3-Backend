@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Model;
+package com.concord.proficio.Domain.Entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "competencia")
-public class Competencia {
+@Table(name = "setor")
+public class Setor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_competencia")
+	@Column(name = "id_setor")
 	private Integer id;
 
-	@Column(name = "nome", nullable = false, length = 45)
+	@Column(name = "nome_setor", nullable = false, length = 50)
 	private String nome;
 
-	@Column(name = "tipo", nullable = false)
-	private Byte tipo;
+	@Column(name = "desc_setor", length = 100)
+	private String descricao;
 }

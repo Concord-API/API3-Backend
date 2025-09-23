@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Model;
+package com.concord.proficio.Domain.Entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
