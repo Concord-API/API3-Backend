@@ -1,4 +1,4 @@
-package com.concord.proficio.Presentation.Controller;
+package com.concord.proficio.presentation.controller;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;

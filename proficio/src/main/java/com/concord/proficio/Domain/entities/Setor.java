@@ -1,13 +1,10 @@
-package com.concord.proficio.Domain.Entities;
+package com.concord.proficio.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,20 +14,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "cargo")
-public class Cargo {
+@Table(name = "setor")
+public class Setor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_cargo")
-	private Integer id;
+	@Column(name = "id_setor")
+	private Long id;
 
-	@Column(name = "nome_cargo", nullable = false, length = 50)
+	@Column(name = "nome_setor", nullable = false, length = 50)
 	private String nome;
 
-	@Column(name = "desc_cargo", length = 100)
+	@Column(name = "desc_setor", length = 100)
 	private String descricao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_setor", nullable = false)
-	private Setor setor;
+	@Column(name = "status", length = 1)
+	private Boolean status;
 }

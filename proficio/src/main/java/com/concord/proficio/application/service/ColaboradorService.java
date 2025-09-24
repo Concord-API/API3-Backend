@@ -1,7 +1,7 @@
-package com.concord.proficio.Application.Service;
+package com.concord.proficio.application.service;
 
-import com.concord.proficio.Domain.Entities.Colaborador;
-import com.concord.proficio.Infra.Repositories.ColaboradorRepository;
+import com.concord.proficio.domain.entities.Colaborador;
+import com.concord.proficio.Infra.repositories.ColaboradorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
