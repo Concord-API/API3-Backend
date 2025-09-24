@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Entities;
+package com.concord.proficio.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,11 +19,14 @@ public class Setor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_setor")
-	private Integer id;
+	private Long id;
 
 	@Column(name = "nome_setor", nullable = false, length = 50)
 	private String nome;
 
 	@Column(name = "desc_setor", length = 100)
 	private String descricao;
+
+	@Column(name = "status", length = 1)
+	private Boolean status;
 }

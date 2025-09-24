@@ -1,30 +1,27 @@
-package com.concord.proficio.Domain.Entities;
+package com.concord.proficio.domain.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "colaborador")
-public class Colaborador {
+public class Colaborador implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_colaborador")
@@ -42,8 +39,18 @@ public class Colaborador {
 	@Column(name = "sobrenome", nullable = false, length = 50)
 	private String sobrenome;
 
-	@Column(name = "status_col", length = 1)
-	private String status;
+	@Column(name = "email", nullable = false, unique = true, length = 256)
+	private String email;
+
+	@Column(name = "senha", nullable = false, length = 256)
+	private String senha;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role", nullable = false, length = 50)
+	private ColaboradorRoleEnum role;
+
+	@Column(name = "status", length = 1)
+	private Boolean status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_cargo", nullable = false)
@@ -69,4 +76,39 @@ public class Colaborador {
 	@LastModifiedDate
 	@Column(name = "atualizado_em")
 	private LocalDateTime atualizadoEm;
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(this.role.getRole()));
+	}
+
+	@Override
+	public String getPassword() {
+		return senha;
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }

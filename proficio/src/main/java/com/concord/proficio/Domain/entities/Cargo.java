@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Entities;
+package com.concord.proficio.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,13 +22,16 @@ public class Cargo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_cargo")
-	private Integer id;
+	private Long id;
 
 	@Column(name = "nome_cargo", nullable = false, length = 50)
 	private String nome;
 
 	@Column(name = "desc_cargo", length = 100)
 	private String descricao;
+
+	@Column(name = "status", length = 1)
+	private Boolean status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_setor", nullable = false)

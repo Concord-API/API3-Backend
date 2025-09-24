@@ -1,4 +1,4 @@
-package com.concord.proficio.Domain.Entities;
+package com.concord.proficio.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ public class Competencia {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_competencia")
-	private Integer id;
+	private Long id;
 
 	@Column(name = "nome", nullable = false, length = 45)
 	private String nome;

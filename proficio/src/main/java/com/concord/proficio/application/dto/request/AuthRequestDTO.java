@@ -1,4 +1,6 @@
 package com.concord.proficio.application.dto.request;
 
-public class AutenticarUsuarioDto {
+public class AuthRequestDTO {
+    public String email;
+    public String password;
 }
