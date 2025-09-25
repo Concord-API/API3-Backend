@@ -1,8 +1,10 @@
-package com.concord.proficio.Infra.repositories;
+package com.concord.proficio.infra.repositories;
 
-import com.concord.proficio.domain.entities.Colaborador;
+import com.concord.proficio.domain.entities.Cargo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CargoRepository
-        extends JpaRepository<Colaborador, Long> {
+import java.util.Optional;
+
+public interface CargoRepository extends JpaRepository<Cargo, Long> {
+    Optional<Cargo> findByNome(String nome);
 }
