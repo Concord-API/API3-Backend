@@ -1,4 +1,4 @@
-package com.concord.proficio.Infra.repositories;
+package com.concord.proficio.infra.repositories;
 
 import com.concord.proficio.domain.entities.Colaborador;
 import org.springframework.data.jpa.repository.JpaRepository;
