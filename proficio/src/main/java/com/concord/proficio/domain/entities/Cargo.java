@@ -7,39 +7,35 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "colaborador_competencia")
-public class ColaboradorCompetencia {
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@Table(name = "cargo")
+public class Cargo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
+	@Column(name = "id_cargo")
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_colaborador", nullable = false)
-	private Colaborador colaborador;
+	@Column(name = "nome_cargo", nullable = false, length = 50)
+	private String nome;
+
+	@Column(name = "desc_cargo", length = 100)
+	private String descricao;
+
+	@Column(name = "status", length = 1)
+	private Boolean status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_competencia", nullable = false)
-	private Competencia competencia;
-
-	@Column(name = "proeficiencia", nullable = false)
-	private Integer proeficiencia;
-
-	@Column(name = "ordem")
-	private Integer ordem;
-
-	@Lob
-	@Column(name = "certificado")
-	private byte[] certificado;
+	@JoinColumn(name = "id_setor", nullable = false)
+	private Setor setor;
 }
