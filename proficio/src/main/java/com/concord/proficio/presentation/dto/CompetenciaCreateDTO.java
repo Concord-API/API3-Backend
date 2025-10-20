@@ -1,18 +1,19 @@
 package com.concord.proficio.presentation.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompetenciaDTO {
-    private Long id;
+public class CompetenciaCreateDTO {
+    @NotBlank
     private String nome;
+
+    @NotNull
     private Byte tipo;
-    private Integer proeficiencia;
-    private Integer ordem;
 }

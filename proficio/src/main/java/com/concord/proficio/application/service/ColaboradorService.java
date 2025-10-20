@@ -1,12 +1,16 @@
+// ...existing code...
 package com.concord.proficio.application.service;
 
 import com.concord.proficio.domain.entities.Colaborador;
 import com.concord.proficio.domain.entities.ColaboradorCompetencia;
-import com.concord.proficio.presentation.dto.ColaboradorResponseDTO;
+import com.concord.proficio.domain.entities.Competencia;
+import com.concord.proficio.presentation.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.presentation.dto.CompetenciaDTO;
 import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import com.concord.proficio.infra.repositories.ColaboradorCompetenciaRepository;
+import com.concord.proficio.infra.repositories.CompetenciaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,76 +21,23 @@ public class ColaboradorService {
 
     private final ColaboradorRepository colaboradorRepository;
     private final ColaboradorCompetenciaRepository colaboradorCompetenciaRepository;
+    private final CompetenciaRepository competenciaRepository;
 
     public ColaboradorService(ColaboradorRepository colaboradorRepository,
-                              ColaboradorCompetenciaRepository colaboradorCompetenciaRepository) {
+                              ColaboradorCompetenciaRepository colaboradorCompetenciaRepository,
+                              CompetenciaRepository competenciaRepository) {
         this.colaboradorRepository = colaboradorRepository;
         this.colaboradorCompetenciaRepository = colaboradorCompetenciaRepository;
+        this.competenciaRepository = competenciaRepository;
     }
 
-    // ---------------------------
-    // CRUD básico do colaborador
-    // ---------------------------
-    public List<Colaborador> listarTodos() {
-        return colaboradorRepository.findAll();
-    }
-
-    public Optional<Colaborador> buscarPorId(Long id) {
-        return colaboradorRepository.findById(id);
-    }
-
-    public Colaborador salvar(Colaborador colaborador) {
-        return colaboradorRepository.save(colaborador);
-    }
-
-    public void deletar(Long id) {
-        colaboradorRepository.deleteById(id);
-    }
-
-    // ---------------------------
-    // Atualização de arquivos
-    // ---------------------------
-    public void atualizarFoto(Long id, byte[] foto) {
-        colaboradorRepository.findById(id).ifPresent(c -> {
-            c.setAvatar(foto);
-            colaboradorRepository.save(c);
-        });
-    }
-
-    public void atualizarCapa(Long id, byte[] capa) {
-        colaboradorRepository.findById(id).ifPresent(c -> {
-            c.setCapa(capa);
-            colaboradorRepository.save(c);
-        });
-    }
-
-    // ---------------------------
-    // Competências do colaborador
-    // ---------------------------
-    public List<ColaboradorCompetencia> listarCompetencias(Long colaboradorId) {
-        return colaboradorCompetenciaRepository.findByColaboradorId(colaboradorId);
-    }
-
-    public ColaboradorCompetencia adicionarCompetencia(ColaboradorCompetencia competencia) {
-        return colaboradorCompetenciaRepository.save(competencia);
-    }
-
-    public void removerCompetencia(Long competenciaId) {
-        colaboradorCompetenciaRepository.deleteById(competenciaId);
-    }
-
-    // ---------------------------
-    // DTO mapping
-    // ---------------------------
-    public Optional<ColaboradorResponseDTO> buscarDetalhadoComCompetencias(Long id) {
-        Optional<Colaborador> optional = colaboradorRepository.findById(id);
-        if (optional.isEmpty()) {
+    // listar competências como DTOs (para endpoint GET /api/colaboradores/{id}/competencias)
+    public Optional<List<CompetenciaDTO>> listarCompetenciasDTO(Long colaboradorId) {
+        if (colaboradorRepository.findById(colaboradorId).isEmpty()) {
             return Optional.empty();
         }
-        Colaborador colaborador = optional.get();
-
-        List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorId(colaborador.getId());
-        List<CompetenciaDTO> competenciaDTOs = competencias.stream()
+        List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorId(colaboradorId);
+        List<CompetenciaDTO> dtos = competencias.stream()
                 .map(cc -> CompetenciaDTO.builder()
                         .id(cc.getCompetencia().getId())
                         .nome(cc.getCompetencia().getNome())
@@ -95,18 +46,59 @@ public class ColaboradorService {
                         .ordem(cc.getOrdem())
                         .build())
                 .collect(Collectors.toList());
-
-        ColaboradorResponseDTO dto = ColaboradorResponseDTO.builder()
-                .id(colaborador.getId())
-                .nome(colaborador.getNome())
-                .sobrenome(colaborador.getSobrenome())
-                .email(colaborador.getEmail())
-                .cpf(colaborador.getCpf())
-                .dataNascimento(colaborador.getDataNascimento())
-                .status(colaborador.getStatus())
-                .competencias(competenciaDTOs)
-                .build();
-
-        return Optional.of(dto);
+        return Optional.of(dtos);
     }
+
+    // atualizar/adicionar lista de competências do colaborador (PATCH)
+    @Transactional
+    public Optional<List<CompetenciaDTO>> atualizarCompetencias(Long colaboradorId, List<ColaboradorCompetenciaUpdateItemDTO> items) {
+        Optional<Colaborador> optionalCol = colaboradorRepository.findById(colaboradorId);
+        if (optionalCol.isEmpty()) {
+            return Optional.empty();
+        }
+        Colaborador colaborador = optionalCol.get();
+
+        for (ColaboradorCompetenciaUpdateItemDTO item : items) {
+            Long compId = item.getCompetenciaId();
+            Integer proef = item.getProeficiencia();
+            Integer ordem = item.getOrdem();
+
+            Competencia competencia = competenciaRepository.findById(compId)
+                    .orElseThrow(() -> new IllegalArgumentException("Competencia não encontrada: " + compId));
+
+            Optional<ColaboradorCompetencia> existente = colaboradorCompetenciaRepository
+                    .findByColaboradorIdAndCompetenciaId(colaboradorId, compId);
+
+            if (existente.isPresent()) {
+                ColaboradorCompetencia cc = existente.get();
+                cc.setProeficiencia(proef);
+                cc.setOrdem(ordem);
+                colaboradorCompetenciaRepository.save(cc);
+            } else {
+                ColaboradorCompetencia novo = new ColaboradorCompetencia();
+                novo.setColaborador(colaborador);
+                novo.setCompetencia(competencia);
+                novo.setProeficiencia(proef != null ? proef : 0);
+                novo.setOrdem(ordem);
+                colaboradorCompetenciaRepository.save(novo);
+            }
+        }
+
+        return listarCompetenciasDTO(colaboradorId);
+    }
+
+    // remover uma competência específica do colaborador (verifica vínculo)
+    @Transactional
+    public boolean removerCompetencia(Long colaboradorId, Long colaboradorCompetenciaId) {
+        Optional<ColaboradorCompetencia> optional = colaboradorCompetenciaRepository.findById(colaboradorCompetenciaId);
+        if (optional.isEmpty()) return false;
+        ColaboradorCompetencia cc = optional.get();
+        if (cc.getColaborador() == null || !colaboradorId.equals(cc.getColaborador().getId())) {
+            return false;
+        }
+        colaboradorCompetenciaRepository.deleteById(colaboradorCompetenciaId);
+        return true;
+    }
+
+    // ...existing code...
 }
