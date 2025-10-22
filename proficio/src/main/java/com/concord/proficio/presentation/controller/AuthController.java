@@ -1,8 +1,11 @@
 package com.concord.proficio.presentation.controller;
 
-import com.concord.proficio.infra.security.JwtTokenService;
-import com.concord.proficio.infra.repositories.ColaboradorRepository;
+import com.concord.proficio.application.dto.request.AuthRequestDTO;
+import com.concord.proficio.application.dto.response.AuthResponseDTO;
+import com.concord.proficio.application.dto.response.UserPayloadDTO;
 import com.concord.proficio.domain.entities.Colaborador;
+import com.concord.proficio.infra.repositories.ColaboradorRepository;
+import com.concord.proficio.infra.security.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,16 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-
 @RestController
 @RequestMapping("api")
 public class AuthController {
-
-    public static record LoginRequest(@Email String email, @NotBlank String password) {}
-    public static record LoginResponse(String token, UserPayload user) {}
-    public static record UserPayload(String id, String name, String email, String role) {}
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -39,19 +35,19 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Colaborador principal = (Colaborador) authentication.getPrincipal();
         String token = jwtTokenService.generateToken(principal);
-        UserPayload payload = new UserPayload(
+        UserPayloadDTO payload = new UserPayloadDTO(
                 String.valueOf(principal.getId()),
                 (principal.getNome() + " " + principal.getSobrenome()).trim(),
                 principal.getEmail(),
                 principal.getRole().getRole()
         );
-        return ResponseEntity.ok(new LoginResponse(token, payload));
+        return ResponseEntity.ok(new AuthResponseDTO(token, payload));
     }
 }
