@@ -39,6 +39,4 @@ public class Equipe {
 	@JoinColumn(name = "id_setor", nullable = false)
 	private Setor setor;
 
-	@Column(name = "status", length = 1)
-	private Boolean status;
 }
