@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface ColaboradorCompetenciaRepository extends JpaRepository<ColaboradorCompetencia, Long> {
     List<ColaboradorCompetencia> findByColaboradorId(Long colaboradorId);
 
-    // novo método para encontrar por colaborador + competencia
     Optional<ColaboradorCompetencia> findByColaboradorIdAndCompetenciaId(Long colaboradorId, Long competenciaId);
 }

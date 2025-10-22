@@ -2,6 +2,7 @@ package com.concord.proficio.infra.configurations;
 
 import com.concord.proficio.domain.entities.*;
 import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
+import com.concord.proficio.domain.enums.GeneroEnum;
 import com.concord.proficio.infra.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +51,7 @@ public class DatabaseSeeder {
                 admin.setStatus(true);
                 admin.setCargo(cargoDiretor);
                 admin.setEquipe(equipeAdmin);
+                admin.setGenero(GeneroEnum.Masculino);
                 colaboradorRepository.save(admin);
             }
         };

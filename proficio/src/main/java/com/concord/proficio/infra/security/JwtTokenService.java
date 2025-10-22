@@ -55,7 +55,6 @@ public class JwtTokenService {
     }
 
     private byte[] resolveKey() {
-        // aceita secret raw ou base64
         try {
             return Decoders.BASE64.decode(secret);
         } catch (Exception e) {

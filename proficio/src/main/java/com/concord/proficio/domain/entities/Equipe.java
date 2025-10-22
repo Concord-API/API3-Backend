@@ -38,4 +38,5 @@ public class Equipe {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_setor", nullable = false)
 	private Setor setor;
+
 }
