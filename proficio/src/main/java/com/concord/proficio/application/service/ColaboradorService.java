@@ -1,4 +1,3 @@
-// ...existing code...
 package com.concord.proficio.application.service;
 
 import com.concord.proficio.domain.entities.Colaborador;
@@ -99,6 +98,4 @@ public class ColaboradorService {
         colaboradorCompetenciaRepository.deleteById(colaboradorCompetenciaId);
         return true;
     }
-
-    // ...existing code...
 }

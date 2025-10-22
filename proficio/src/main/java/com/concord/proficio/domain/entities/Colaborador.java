@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
+import com.concord.proficio.domain.enums.GeneroEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +47,10 @@ public class Colaborador implements UserDetails {
 
 	@Column(name = "senha", nullable = false, length = 256)
 	private String senha;
+
+    @Enumerated(EnumType.ORDINAL)
+	@Column(name = "genero", nullable = false)
+	private GeneroEnum genero;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false, length = 50)

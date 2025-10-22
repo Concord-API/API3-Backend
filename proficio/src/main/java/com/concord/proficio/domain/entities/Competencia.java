@@ -26,4 +26,7 @@ public class Competencia {
 
 	@Column(name = "tipo", nullable = false)
 	private Byte tipo;
+	
+	@Column(name = "status", length = 1)
+	private Boolean status;
 }
