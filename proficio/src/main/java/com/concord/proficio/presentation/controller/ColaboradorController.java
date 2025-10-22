@@ -1,8 +1,11 @@
 package com.concord.proficio.presentation.controller;
 
+import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.service.ColaboradorService;
-import com.concord.proficio.presentation.dto.ColaboradorCompetenciaUpdateDTO;
-import com.concord.proficio.presentation.dto.CompetenciaDTO;
+import com.concord.proficio.application.dto.ColaboradorCompetenciaDTO;
+import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaResponseViewModel;
+import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateRequestViewModel;
+import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateItemRequestViewModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,26 +21,49 @@ public class ColaboradorController {
         this.colaboradorService = colaboradorService;
     }
 
-    // Endpoints relacionados a competências do colaborador
 
     @GetMapping("/{id}/competencias")
-    public ResponseEntity<List<CompetenciaDTO>> listarCompetencias(@PathVariable Long id) {
+    public ResponseEntity<List<ColaboradorCompetenciaResponseViewModel>> listarCompetencias(@PathVariable Long id) {
         return colaboradorService.listarCompetenciasDTO(id)
-                .map(ResponseEntity::ok)
+                .map(dtos -> ResponseEntity.ok(
+                        dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
+                                .id(dto.getId())
+                                .nome(dto.getNome())
+                                .tipo(dto.getTipo())
+                                .proeficiencia(dto.getProeficiencia())
+                                .ordem(dto.getOrdem())
+                                .build())
+                                .toList()
+                ))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/competencias")
-    public ResponseEntity<List<CompetenciaDTO>> atualizarCompetencias(
+    public ResponseEntity<List<ColaboradorCompetenciaResponseViewModel>> atualizarCompetencias(
             @PathVariable Long id,
-            @RequestBody ColaboradorCompetenciaUpdateDTO request) {
+            @jakarta.validation.Valid @RequestBody ColaboradorCompetenciaUpdateRequestViewModel request) {
 
         if (request == null || request.getItems() == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        return colaboradorService.atualizarCompetencias(id, request.getItems())
-                .map(ResponseEntity::ok)
+        List<ColaboradorCompetenciaUpdateItemDTO> items = request.getItems().stream()
+                .map(vm -> new ColaboradorCompetenciaUpdateItemDTO(
+                        vm.getCompetenciaId(), vm.getProeficiencia(), vm.getOrdem()
+                ))
+                .toList();
+
+        return colaboradorService.atualizarCompetencias(id, items)
+                .map(dtos -> ResponseEntity.ok(
+                        dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
+                                .id(dto.getId())
+                                .nome(dto.getNome())
+                                .tipo(dto.getTipo())
+                                .proeficiencia(dto.getProeficiencia())
+                                .ordem(dto.getOrdem())
+                                .build())
+                                .toList()
+                ))
                 .orElse(ResponseEntity.notFound().build());
     }
 

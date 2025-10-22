@@ -2,8 +2,9 @@ package com.concord.proficio.presentation.controller;
 
 import com.concord.proficio.application.service.CompetenciaService;
 import com.concord.proficio.domain.entities.Competencia;
-import com.concord.proficio.presentation.dto.CompetenciaCreateDTO;
-import com.concord.proficio.presentation.dto.CompetenciaDTO;
+import com.concord.proficio.application.dto.CompetenciaDTO;
+import com.concord.proficio.presentation.viewmodel.CompetenciaCreateRequestViewModel;
+import com.concord.proficio.presentation.viewmodel.CompetenciaResponseViewModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,30 +23,28 @@ public class CompetenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CompetenciaDTO>> listar() {
-        List<CompetenciaDTO> dtos = competenciaService.listarTodos().stream()
-                .map(c -> CompetenciaDTO.builder()
+    public ResponseEntity<List<CompetenciaResponseViewModel>> listar() {
+        List<CompetenciaResponseViewModel> vms = competenciaService.listarTodos().stream()
+                .map(c -> CompetenciaResponseViewModel.builder()
                         .id(c.getId())
                         .nome(c.getNome())
                         .tipo(c.getTipo())
-                        .proeficiencia(null)
-                        .ordem(null)
                         .build())
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(vms);
     }
 
     @PostMapping
-    public ResponseEntity<CompetenciaDTO> criar(@Valid @RequestBody CompetenciaCreateDTO req) {
+    public ResponseEntity<CompetenciaResponseViewModel> criar(@Valid @RequestBody CompetenciaCreateRequestViewModel req) {
         Competencia c = new Competencia();
         c.setNome(req.getNome());
         c.setTipo(req.getTipo());
         Competencia criado = competenciaService.criar(c);
-        CompetenciaDTO dto = CompetenciaDTO.builder()
+        CompetenciaResponseViewModel vm = CompetenciaResponseViewModel.builder()
                 .id(criado.getId())
                 .nome(criado.getNome())
                 .tipo(criado.getTipo())
                 .build();
-        return ResponseEntity.status(201).body(dto);
+        return ResponseEntity.status(201).body(vm);
     }
 }

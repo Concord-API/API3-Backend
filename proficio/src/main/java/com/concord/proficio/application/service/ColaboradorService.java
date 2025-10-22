@@ -3,8 +3,8 @@ package com.concord.proficio.application.service;
 import com.concord.proficio.domain.entities.Colaborador;
 import com.concord.proficio.domain.entities.ColaboradorCompetencia;
 import com.concord.proficio.domain.entities.Competencia;
-import com.concord.proficio.presentation.dto.ColaboradorCompetenciaUpdateItemDTO;
-import com.concord.proficio.presentation.dto.CompetenciaDTO;
+import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
+import com.concord.proficio.application.dto.ColaboradorCompetenciaDTO;
 import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import com.concord.proficio.infra.repositories.ColaboradorCompetenciaRepository;
 import com.concord.proficio.infra.repositories.CompetenciaRepository;
@@ -30,14 +30,13 @@ public class ColaboradorService {
         this.competenciaRepository = competenciaRepository;
     }
 
-    // listar competências como DTOs (para endpoint GET /api/colaboradores/{id}/competencias)
-    public Optional<List<CompetenciaDTO>> listarCompetenciasDTO(Long colaboradorId) {
+    public Optional<List<ColaboradorCompetenciaDTO>> listarCompetenciasDTO(Long colaboradorId) {
         if (colaboradorRepository.findById(colaboradorId).isEmpty()) {
             return Optional.empty();
         }
         List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorId(colaboradorId);
-        List<CompetenciaDTO> dtos = competencias.stream()
-                .map(cc -> CompetenciaDTO.builder()
+        List<ColaboradorCompetenciaDTO> dtos = competencias.stream()
+                .map(cc -> ColaboradorCompetenciaDTO.builder()
                         .id(cc.getCompetencia().getId())
                         .nome(cc.getCompetencia().getNome())
                         .tipo(cc.getCompetencia().getTipo())
@@ -48,9 +47,8 @@ public class ColaboradorService {
         return Optional.of(dtos);
     }
 
-    // atualizar/adicionar lista de competências do colaborador (PATCH)
     @Transactional
-    public Optional<List<CompetenciaDTO>> atualizarCompetencias(Long colaboradorId, List<ColaboradorCompetenciaUpdateItemDTO> items) {
+    public Optional<List<ColaboradorCompetenciaDTO>> atualizarCompetencias(Long colaboradorId, List<ColaboradorCompetenciaUpdateItemDTO> items) {
         Optional<Colaborador> optionalCol = colaboradorRepository.findById(colaboradorId);
         if (optionalCol.isEmpty()) {
             return Optional.empty();
@@ -86,7 +84,6 @@ public class ColaboradorService {
         return listarCompetenciasDTO(colaboradorId);
     }
 
-    // remover uma competência específica do colaborador (verifica vínculo)
     @Transactional
     public boolean removerCompetencia(Long colaboradorId, Long colaboradorCompetenciaId) {
         Optional<ColaboradorCompetencia> optional = colaboradorCompetenciaRepository.findById(colaboradorCompetenciaId);
