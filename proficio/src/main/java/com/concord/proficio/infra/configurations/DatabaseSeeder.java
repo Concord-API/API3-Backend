@@ -46,7 +46,7 @@ public class DatabaseSeeder {
                 admin.setSobrenome("Cordeiro");
                 admin.setEmail("diretor@example.com");
                 admin.setSenha(passwordEncoder.encode("123456")); // senha default
-                admin.setRole(ColaboradorRoleEnum.DIRETOR);
+                admin.setRole(ColaboradorRoleEnum.Diretor);
                 admin.setStatus(true);
                 admin.setCargo(cargoDiretor);
                 admin.setEquipe(equipeAdmin);
