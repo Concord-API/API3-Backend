@@ -12,5 +12,7 @@ public class SetorResponseViewModel {
 	private String nome;
 	private String descricao;
 	private Boolean status;
+	private Long equipesCount;
+	private Long colaboradoresCount;
 }
 
