@@ -39,19 +39,28 @@ public class SetorService {
 		return setorRepository.findById(id);
 	}
 
+
 	@Transactional
-	public Setor criar(Setor setor) {
+	public Setor criar(Setor setor, Long diretorId) {
+		if (diretorId != null) {
+			colaboradorRepository.findById(diretorId).ifPresent(setor::setDiretor);
+		}
 		return setorRepository.save(setor);
 	}
 
 
 	@Transactional
-	public Optional<Setor> atualizar(Long id, String nome, String descricao) {
+	public Optional<Setor> atualizar(Long id, String nome, String descricao, Long diretorId) {
 		Optional<Setor> optional = setorRepository.findById(id);
 		if (optional.isEmpty()) return Optional.empty();
 		Setor existente = optional.get();
 		existente.setNome(nome);
 		existente.setDescricao(descricao);
+		if (diretorId == null) {
+			existente.setDiretor(null);
+		} else {
+			colaboradorRepository.findById(diretorId).ifPresent(existente::setDiretor);
+		}
 		return Optional.of(setorRepository.save(existente));
 	}
 

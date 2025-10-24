@@ -14,5 +14,6 @@ public class SetorResponseViewModel {
 	private Boolean status;
 	private Long equipesCount;
 	private Long colaboradoresCount;
+    private Long diretorId;
 }
 
