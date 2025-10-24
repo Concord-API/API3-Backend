@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 
 import com.concord.proficio.infra.security.JwtAuthenticationFilter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -65,10 +66,14 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-                        .requestMatchers("/error").permitAll() 
-                        .requestMatchers(HttpMethod.POST, "/api/colaboradores").hasAnyRole("GESTOR", "DIRETOR")
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/setores/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/setores").hasRole("Diretor")
                         .requestMatchers(HttpMethod.GET, "/api/colaboradores/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/colaboradores").hasAnyRole("Gestor","Diretor")
+                        .requestMatchers(HttpMethod.POST, "/api/colaboradores").hasAnyRole("Gestor","Diretor")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -78,6 +83,11 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        return new GrantedAuthorityDefaults("");
     }
 
     @Bean

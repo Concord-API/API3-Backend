@@ -1,11 +1,11 @@
 package com.concord.proficio.domain.enums;
 
 public enum ColaboradorRoleEnum {
-    COLABORADOR,
-    GESTOR,
-    DIRETOR;
+    Colaborador,
+    Gestor,
+    Diretor;
 
     public String getRole() {
-        return "ROLE_" + this.name();
+        return "Role_" + this.name();
     }
 }
