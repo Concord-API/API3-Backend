@@ -29,6 +29,7 @@ public class SetorController {
 						.nome(s.getNome())
 						.descricao(s.getDescricao())
 						.status(s.getStatus())
+						.diretorId(s.getDiretor() != null ? s.getDiretor().getId() : null)
 						.equipesCount(setorService.contarEquipesAtivasDoSetor(s.getId()))
 						.colaboradoresCount(setorService.contarColaboradoresAtivosDoSetor(s.getId()))
 						.build())
@@ -43,12 +44,13 @@ public class SetorController {
 					if (Boolean.FALSE.equals(existing.getStatus())) {
 						existing.setStatus(true);
 						existing.setDescricao(req.getDescricao());
-						Setor reativado = setorService.criar(existing);
+						Setor reativado = setorService.criar(existing, req.getDiretorId());
 						SetorResponseViewModel vm = SetorResponseViewModel.builder()
 								.id(reativado.getId())
 								.nome(reativado.getNome())
 								.descricao(reativado.getDescricao())
 								.status(reativado.getStatus())
+								.diretorId(reativado.getDiretor() != null ? reativado.getDiretor().getId() : null)
 								.build();
 						return ResponseEntity.ok(vm);
 					}
@@ -59,12 +61,13 @@ public class SetorController {
 					s.setNome(req.getNome());
 					s.setDescricao(req.getDescricao());
 					s.setStatus(true);
-					Setor criado = setorService.criar(s);
+					Setor criado = setorService.criar(s, req.getDiretorId());
 					SetorResponseViewModel vm = SetorResponseViewModel.builder()
 							.id(criado.getId())
 							.nome(criado.getNome())
 							.descricao(criado.getDescricao())
 							.status(criado.getStatus())
+							.diretorId(criado.getDiretor() != null ? criado.getDiretor().getId() : null)
 							.build();
 					return ResponseEntity.status(201).body(vm);
 				});
@@ -73,12 +76,13 @@ public class SetorController {
 	@PutMapping("/{id}")
 	public ResponseEntity<SetorResponseViewModel> atualizar(@PathVariable Long id,
 			@Valid @RequestBody SetorUpdateRequestViewModel req) {
-		return setorService.atualizar(id, req.getNome(), req.getDescricao())
+		return setorService.atualizar(id, req.getNome(), req.getDescricao(), req.getDiretorId())
 				.map(atualizado -> ResponseEntity.ok(SetorResponseViewModel.builder()
 						.id(atualizado.getId())
 						.nome(atualizado.getNome())
 						.descricao(atualizado.getDescricao())
 						.status(atualizado.getStatus())
+						.diretorId(atualizado.getDiretor() != null ? atualizado.getDiretor().getId() : null)
 						.build()))
 				.orElseGet(() -> ResponseEntity.status(404).body((SetorResponseViewModel) null));
 	}

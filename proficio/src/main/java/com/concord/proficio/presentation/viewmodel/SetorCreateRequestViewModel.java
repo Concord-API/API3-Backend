@@ -12,4 +12,6 @@ public class SetorCreateRequestViewModel {
 
 	@Size(max = 100)
 	private String descricao;
+
+	private Long diretorId;
 }
