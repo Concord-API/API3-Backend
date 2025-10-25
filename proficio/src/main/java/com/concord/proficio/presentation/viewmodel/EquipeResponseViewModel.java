@@ -13,4 +13,5 @@ public class EquipeResponseViewModel {
     private Boolean status;
     private Long gestorId;
     private Long setorId;
+    private Long colaboradoresCount;
 }
