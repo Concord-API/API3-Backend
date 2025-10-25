@@ -24,7 +24,7 @@ public class DatabaseSeeder {
             // ---- SETOR ----
             Setor setorAdmin = setorRepository.findByNome("Administração")
                     .orElseGet(() -> setorRepository.save(
-                            new Setor(null, "Administração", "Setor administrativo", true)
+                            new Setor(null, "Administração", "Setor administrativo",null ,true)
                     ));
 
             // ---- CARGO ----
