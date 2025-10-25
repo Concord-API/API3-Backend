@@ -29,7 +29,7 @@ public class Equipe {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_gestor", nullable = true)
-	private Colaborador colaborador;
+	private Colaborador gestor;
 
 	@Column(name = "status", length = 1)
 	private Boolean status;

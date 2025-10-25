@@ -13,5 +13,7 @@ public interface ColaboradorRepository extends JpaRepository<Colaborador, Long> 
 
     long countByEquipeSetorIdAndStatusTrue(Long setorId);
 
+    long countByEquipeIdAndStatusTrue(Long equipeId);
+
     List<Colaborador> findByEquipeSetorIdAndStatusTrue(Long setorId);
 }

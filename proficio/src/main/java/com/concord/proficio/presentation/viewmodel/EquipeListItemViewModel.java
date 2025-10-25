@@ -10,5 +10,5 @@ import lombok.Data;
 public class EquipeListItemViewModel {
     private Long id;
     private String nome;
-    private String gerente;
+    private String gestor;
 }
