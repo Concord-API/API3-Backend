@@ -5,9 +5,17 @@ import com.concord.proficio.domain.entities.ColaboradorCompetencia;
 import com.concord.proficio.domain.entities.Competencia;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaDTO;
+import com.concord.proficio.application.dto.PerfilUpdateDTO;
+import com.concord.proficio.application.dto.PerfilResponseDTO;
+import com.concord.proficio.application.dto.ColaboradorListDTO;
 import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import com.concord.proficio.infra.repositories.ColaboradorCompetenciaRepository;
 import com.concord.proficio.infra.repositories.CompetenciaRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.ReflectionUtils;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,5 +102,94 @@ public class ColaboradorService {
         }
         colaboradorCompetenciaRepository.deleteById(colaboradorCompetenciaId);
         return true;
+    }
+
+    @Transactional
+    public Optional<PerfilResponseDTO> atualizarPerfil(Long colaboradorId, PerfilUpdateDTO perfilUpdate) {
+        Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(colaboradorId);
+        if (optionalColaborador.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Colaborador colaborador = optionalColaborador.get();
+        
+        // Atualização parcial usando BeanUtils, ignorando valores nulos
+        BeanUtils.copyProperties(perfilUpdate, colaborador, getNullPropertyNames(perfilUpdate));
+        
+        Colaborador colaboradorAtualizado = colaboradorRepository.save(colaborador);
+        
+        return Optional.of(PerfilResponseDTO.builder()
+                .id(colaboradorAtualizado.getId())
+                .nome(colaboradorAtualizado.getNome())
+                .sobrenome(colaboradorAtualizado.getSobrenome())
+                .email(colaboradorAtualizado.getEmail())
+                .dataNascimento(colaboradorAtualizado.getDataNascimento())
+                .genero(colaboradorAtualizado.getGenero())
+                .avatar(colaboradorAtualizado.getAvatar())
+                .capa(colaboradorAtualizado.getCapa())
+                .criadoEm(colaboradorAtualizado.getCriadoEm())
+                .atualizadoEm(colaboradorAtualizado.getAtualizadoEm())
+                .build());
+    }
+
+    public List<ColaboradorListDTO> listarTodosColaboradores() {
+        List<Colaborador> colaboradores = colaboradorRepository.findAll();
+        return colaboradores.stream()
+                .map(colaborador -> ColaboradorListDTO.builder()
+                        .id(colaborador.getId())
+                        .nome(colaborador.getNome())
+                        .sobrenome(colaborador.getSobrenome())
+                        .email(colaborador.getEmail())
+                        .dataNascimento(colaborador.getDataNascimento())
+                        .genero(colaborador.getGenero())
+                        .avatar(colaborador.getAvatar())
+                        .capa(colaborador.getCapa())
+                        .criadoEm(colaborador.getCriadoEm())
+                        .atualizadoEm(colaborador.getAtualizadoEm())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public Optional<PerfilResponseDTO> obterPerfil(Long colaboradorId) {
+        Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(colaboradorId);
+        if (optionalColaborador.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Colaborador colaborador = optionalColaborador.get();
+        return Optional.of(PerfilResponseDTO.builder()
+                .id(colaborador.getId())
+                .nome(colaborador.getNome())
+                .sobrenome(colaborador.getSobrenome())
+                .email(colaborador.getEmail())
+                .dataNascimento(colaborador.getDataNascimento())
+                .genero(colaborador.getGenero())
+                .avatar(colaborador.getAvatar())
+                .capa(colaborador.getCapa())
+                .criadoEm(colaborador.getCriadoEm())
+                .atualizadoEm(colaborador.getAtualizadoEm())
+                .build());
+    }
+
+    /**
+     * Retorna um array com os nomes das propriedades que são nulas no objeto fornecido
+     */
+    private String[] getNullPropertyNames(Object source) {
+        List<String> nullPropertyNames = new ArrayList<>();
+        Field[] fields = source.getClass().getDeclaredFields();
+        
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(source);
+                if (value == null) {
+                    nullPropertyNames.add(field.getName());
+                }
+            } catch (IllegalAccessException e) {
+                // Ignora campos inacessíveis
+            }
+        }
+        
+        return nullPropertyNames.toArray(new String[0]);
     }
 }
