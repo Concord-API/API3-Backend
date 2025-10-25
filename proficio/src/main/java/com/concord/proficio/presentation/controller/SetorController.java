@@ -101,7 +101,7 @@ public class SetorController {
 								.map(e -> EquipeListItemViewModel.builder()
 										.id(e.getId())
 										.nome(e.getNome())
-										.gestor(e.getGestor())
+										.gestor(String.valueOf(e.getGestor()))
 										.build())
 								.toList()
 				))
