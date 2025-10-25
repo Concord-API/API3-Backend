@@ -2,6 +2,7 @@ package com.concord.proficio.domain.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -62,6 +63,9 @@ public class Colaborador implements UserDetails {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_cargo", nullable = false)
 	private Cargo cargo;
+
+	@OneToMany(mappedBy = "colaborador")
+	private List<Colaborador> equipes = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_equipe", nullable = false)
