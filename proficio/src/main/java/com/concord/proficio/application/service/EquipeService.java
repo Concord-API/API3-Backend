@@ -41,10 +41,15 @@ public class EquipeService {
 
 
     @Transactional
-    public Equipe criar(Equipe equipe, Long gestorId) {
+    public Equipe criar(Equipe equipe, Long setorId, Long gestorId) {
+        Setor setor = setorRepository.findById(setorId)
+                .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado com ID: " + setorId));
+        equipe.setSetor(setor);
+
         if (gestorId != null) {
             colaboradorRepository.findById(gestorId).ifPresent(equipe::setGestor);
         }
+        equipe.setStatus(true);
         return equipeRepository.save(equipe);
     }
 
