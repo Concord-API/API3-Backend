@@ -7,8 +7,11 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class EquipeListItemViewModel {
+public class EquipeResponseViewModel {
     private Long id;
     private String nome;
-    private String gestor;
+    private Boolean status;
+    private Long gestorId;
+    private Long setorId;
+    private Long colaboradoresCount;
 }
