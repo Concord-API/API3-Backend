@@ -23,9 +23,10 @@ public class EquipeController {
 
     @GetMapping
     public ResponseEntity<List<EquipeResponseViewModel>> listar(
-            @RequestParam(value = "q", required = false) String q) {
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "status", required = false, defaultValue = "active") String status) {
 
-        List<Equipe> equipes = equipeService.buscar(q);
+        List<Equipe> equipes = equipeService.buscar(q, status);
         List<EquipeResponseViewModel> vms = new ArrayList<>();
 
         for (Equipe e : equipes) {

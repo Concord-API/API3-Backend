@@ -3,17 +3,16 @@ package com.concord.proficio.presentation.controller;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.dto.PerfilUpdateDTO;
 import com.concord.proficio.application.service.ColaboradorService;
-import com.concord.proficio.application.dto.ColaboradorCompetenciaDTO;
 import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaResponseViewModel;
 import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateRequestViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateItemRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.PerfilUpdateRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.PerfilResponseViewModel;
 import com.concord.proficio.presentation.viewmodel.ColaboradorListResponseViewModel;
 import org.springframework.http.ResponseEntity;
+import java.util.*;
+import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
+import com.concord.proficio.presentation.viewmodel.ColaboradorPerfilResponseViewModel;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/colaboradores")
@@ -91,6 +90,8 @@ public class ColaboradorController {
                         .email(dto.getEmail())
                         .dataNascimento(dto.getDataNascimento())
                         .genero(dto.getGenero())
+                        .role(dto.getRole() != null ? dto.getRole().name() : null)
+                        .cargoNome(dto.getNomeCargo())
                         .avatar(dto.getAvatar())
                         .capa(dto.getCapa())
                         .criadoEm(dto.getCriadoEm())
@@ -106,18 +107,23 @@ public class ColaboradorController {
             @PathVariable Long id,
             @RequestBody PerfilUpdateRequestViewModel request) {
         
-        // Converter ViewModel para DTO
+        byte[] avatarBytes = decodeDataUrlToBytes(request.getAvatar());
+        byte[] capaBytes = decodeDataUrlToBytes(request.getCapa());
         PerfilUpdateDTO perfilUpdate = PerfilUpdateDTO.builder()
                 .nome(request.getNome())
                 .sobrenome(request.getSobrenome())
                 .email(request.getEmail())
                 .dataNascimento(request.getDataNascimento())
                 .genero(request.getGenero())
-                .avatar(request.getAvatar())
-                .capa(request.getCapa())
+                .avatar(avatarBytes)
+                .capa(capaBytes)
                 .build();
         
-        return colaboradorService.atualizarPerfil(id, perfilUpdate)
+        colaboradorService.atualizarPerfil(id, perfilUpdate);
+        if (request.getCompetencias() != null && !request.getCompetencias().isEmpty()) {
+            colaboradorService.atualizarOrdemCompetenciasPerfil(id, request.getCompetencias());
+        }
+        return colaboradorService.obterPerfil(id)
                 .map(dto -> ResponseEntity.ok(PerfilResponseViewModel.builder()
                         .id(dto.getId())
                         .nome(dto.getNome())
@@ -131,5 +137,95 @@ public class ColaboradorController {
                         .atualizadoEm(dto.getAtualizadoEm())
                         .build()))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    private byte[] decodeDataUrlToBytes(String maybeDataUrl) {
+        if (maybeDataUrl == null || maybeDataUrl.isBlank()) return null;
+        try {
+            String raw = maybeDataUrl.trim();
+            int commaIdx = raw.indexOf(',');
+            String base64 = (raw.startsWith("data:") && commaIdx > 0) ? raw.substring(commaIdx + 1) : raw;
+            return java.util.Base64.getDecoder().decode(base64);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping("/{id}/perfil")
+    public ResponseEntity<ColaboradorPerfilResponseViewModel> obterPerfilColaborador(@PathVariable Long id) {
+        return colaboradorService.obterPerfilCompleto(id)
+                .map(dto -> ResponseEntity.ok(mapToVM(dto)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private ColaboradorPerfilResponseViewModel mapToVM(ColaboradorPerfilDTO dto) {
+        ColaboradorPerfilResponseViewModel.CargoVM cargoVM = null;
+        if (dto.getCargo() != null) {
+            cargoVM = ColaboradorPerfilResponseViewModel.CargoVM.builder()
+                    .id_cargo(dto.getCargo().getId())
+                    .nome_cargo(dto.getCargo().getNome())
+                    .desc_cargo(dto.getCargo().getDescricao())
+                    .status(dto.getCargo().getStatus())
+                    .build();
+        }
+        ColaboradorPerfilResponseViewModel.SetorVM setorVM = null;
+        if (dto.getEquipe() != null && dto.getEquipe().getSetor() != null) {
+            setorVM = ColaboradorPerfilResponseViewModel.SetorVM.builder()
+                    .id_setor(dto.getEquipe().getSetor().getId())
+                    .nome_setor(dto.getEquipe().getSetor().getNome())
+                    .desc_setor(dto.getEquipe().getSetor().getDescricao())
+                    .status(dto.getEquipe().getSetor().getStatus())
+                    .build();
+        }
+        ColaboradorPerfilResponseViewModel.EquipeVM equipeVM = null;
+        if (dto.getEquipe() != null) {
+            equipeVM = ColaboradorPerfilResponseViewModel.EquipeVM.builder()
+                    .id_equipe(dto.getEquipe().getId())
+                    .nome_equipe(dto.getEquipe().getNome())
+                    .status(dto.getEquipe().getStatus())
+                    .id_setor(dto.getEquipe().getSetor() != null ? dto.getEquipe().getSetor().getId() : null)
+                    .setor(setorVM)
+                    .build();
+        }
+
+        List<ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM> comps = new ArrayList<>();
+        if (dto.getCompetencias() != null) {
+            for (var cc : dto.getCompetencias()) {
+                ColaboradorPerfilResponseViewModel.CompetenciaItemVM compVM = null;
+                if (cc.getCompetencia() != null) {
+                    compVM = ColaboradorPerfilResponseViewModel.CompetenciaItemVM.builder()
+                            .id_competencia(cc.getCompetencia().getId())
+                            .nome(cc.getCompetencia().getNome())
+                            .tipo(cc.getCompetencia().getTipo())
+                            .build();
+                }
+                comps.add(ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM.builder()
+                        .id(cc.getId())
+                        .id_colaborador(dto.getId())
+                        .id_competencia(cc.getCompetenciaId())
+                        .proeficiencia(cc.getProeficiencia())
+                        .ordem(cc.getOrdem())
+                        .competencia(compVM)
+                        .build());
+            }
+        }
+
+        return ColaboradorPerfilResponseViewModel.builder()
+                .id_colaborador(dto.getId())
+                .nome(dto.getNome())
+                .sobrenome(dto.getSobrenome())
+                .email(dto.getEmail())
+                .status(dto.getStatus())
+                .role(dto.getRole())
+                .criado_em(dto.getCriadoEm() != null ? dto.getCriadoEm().toString() : null)
+                .atualizado_em(dto.getAtualizadoEm() != null ? dto.getAtualizadoEm().toString() : null)
+                .avatar(dto.getAvatar() != null ? Base64.getEncoder().encodeToString(dto.getAvatar()) : null)
+                .capa(dto.getCapa() != null ? Base64.getEncoder().encodeToString(dto.getCapa()) : null)
+                .id_cargo(dto.getCargo() != null ? dto.getCargo().getId() : null)
+                .cargo(cargoVM)
+                .id_equipe(dto.getEquipe() != null ? dto.getEquipe().getId() : null)
+                .equipe(equipeVM)
+                .competencias(comps)
+                .build();
     }
 }

@@ -17,11 +17,22 @@ public class CompetenciaService {
     }
 
     public List<Competencia> listarTodos() {
-        return competenciaRepository.findAll();
+        return competenciaRepository.findByStatusTrue();
+    }
+
+    @Transactional
+    public boolean desativar(Long id) {
+        return competenciaRepository.findById(id)
+                .map(c -> {
+                    c.setStatus(false);
+                    competenciaRepository.save(c);
+                    return true;
+                }).orElse(false);
     }
 
     @Transactional
     public Competencia criar(Competencia competencia) {
+        competencia.setStatus(true);
         return competenciaRepository.save(competencia);
     }
 }

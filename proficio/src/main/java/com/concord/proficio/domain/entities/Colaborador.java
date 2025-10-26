@@ -71,12 +71,12 @@ public class Colaborador implements UserDetails {
 	@JoinColumn(name = "id_equipe", nullable = false)
 	private Equipe equipe;
 
-	@Lob
-	@Column(name = "avatar")
+    @Lob
+    @Column(name = "avatar", columnDefinition = "LONGBLOB")
 	private byte[] avatar;
 
-	@Lob
-	@Column(name = "capa")
+    @Lob
+    @Column(name = "capa", columnDefinition = "LONGBLOB")
 	private byte[] capa;
 
 	@CreatedDate

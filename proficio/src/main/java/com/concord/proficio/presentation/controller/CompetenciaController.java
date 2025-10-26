@@ -2,7 +2,6 @@ package com.concord.proficio.presentation.controller;
 
 import com.concord.proficio.application.service.CompetenciaService;
 import com.concord.proficio.domain.entities.Competencia;
-import com.concord.proficio.application.dto.CompetenciaDTO;
 import com.concord.proficio.presentation.viewmodel.CompetenciaCreateRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.CompetenciaResponseViewModel;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +38,7 @@ public class CompetenciaController {
         Competencia c = new Competencia();
         c.setNome(req.getNome());
         c.setTipo(req.getTipo());
+        c.setStatus(true);
         Competencia criado = competenciaService.criar(c);
         CompetenciaResponseViewModel vm = CompetenciaResponseViewModel.builder()
                 .id(criado.getId())
@@ -47,4 +47,5 @@ public class CompetenciaController {
                 .build();
         return ResponseEntity.status(201).body(vm);
     }
+
 }

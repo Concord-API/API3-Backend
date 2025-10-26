@@ -5,6 +5,7 @@ import com.concord.proficio.domain.entities.ColaboradorCompetencia;
 import com.concord.proficio.domain.entities.Competencia;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaDTO;
+import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
 import com.concord.proficio.application.dto.PerfilUpdateDTO;
 import com.concord.proficio.application.dto.PerfilResponseDTO;
 import com.concord.proficio.application.dto.ColaboradorListDTO;
@@ -12,10 +13,8 @@ import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import com.concord.proficio.infra.repositories.ColaboradorCompetenciaRepository;
 import com.concord.proficio.infra.repositories.CompetenciaRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +41,7 @@ public class ColaboradorService {
         if (colaboradorRepository.findById(colaboradorId).isEmpty()) {
             return Optional.empty();
         }
-        List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorId(colaboradorId);
+        List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorIdAndStatusTrue(colaboradorId);
         List<ColaboradorCompetenciaDTO> dtos = competencias.stream()
                 .map(cc -> ColaboradorCompetenciaDTO.builder()
                         .id(cc.getCompetencia().getId())
@@ -76,8 +75,9 @@ public class ColaboradorService {
 
             if (existente.isPresent()) {
                 ColaboradorCompetencia cc = existente.get();
-                cc.setProeficiencia(proef);
-                cc.setOrdem(ordem);
+                if (proef != null) cc.setProeficiencia(proef);
+                if (ordem != null) cc.setOrdem(ordem);
+                cc.setStatus(true);
                 colaboradorCompetenciaRepository.save(cc);
             } else {
                 ColaboradorCompetencia novo = new ColaboradorCompetencia();
@@ -85,6 +85,7 @@ public class ColaboradorService {
                 novo.setCompetencia(competencia);
                 novo.setProeficiencia(proef != null ? proef : 0);
                 novo.setOrdem(ordem);
+                novo.setStatus(true);
                 colaboradorCompetenciaRepository.save(novo);
             }
         }
@@ -100,7 +101,8 @@ public class ColaboradorService {
         if (cc.getColaborador() == null || !colaboradorId.equals(cc.getColaborador().getId())) {
             return false;
         }
-        colaboradorCompetenciaRepository.deleteById(colaboradorCompetenciaId);
+        cc.setStatus(false);
+        colaboradorCompetenciaRepository.save(cc);
         return true;
     }
 
@@ -142,6 +144,8 @@ public class ColaboradorService {
                         .email(colaborador.getEmail())
                         .dataNascimento(colaborador.getDataNascimento())
                         .genero(colaborador.getGenero())
+                        .role(colaborador.getRole())
+                        .nomeCargo(colaborador.getCargo() != null ? colaborador.getCargo().getNome() : null)
                         .avatar(colaborador.getAvatar())
                         .capa(colaborador.getCapa())
                         .criadoEm(colaborador.getCriadoEm())
@@ -169,6 +173,118 @@ public class ColaboradorService {
                 .criadoEm(colaborador.getCriadoEm())
                 .atualizadoEm(colaborador.getAtualizadoEm())
                 .build());
+    }
+
+    public Optional<ColaboradorPerfilDTO> obterPerfilCompleto(Long colaboradorId) {
+        Optional<Colaborador> optionalColaborador = colaboradorRepository.findById(colaboradorId);
+        if (optionalColaborador.isEmpty()) {
+            return Optional.empty();
+        }
+        Colaborador colab = optionalColaborador.get();
+
+        ColaboradorPerfilDTO.Cargo cargoDTO = null;
+        if (colab.getCargo() != null) {
+            cargoDTO = ColaboradorPerfilDTO.Cargo.builder()
+                    .id(colab.getCargo().getId())
+                    .nome(colab.getCargo().getNome())
+                    .descricao(colab.getCargo().getDescricao())
+                    .status(colab.getCargo().getStatus())
+                    .build();
+        }
+
+        ColaboradorPerfilDTO.Setor setorDTO = null;
+        if (colab.getEquipe() != null && colab.getEquipe().getSetor() != null) {
+            setorDTO = ColaboradorPerfilDTO.Setor.builder()
+                    .id(colab.getEquipe().getSetor().getId())
+                    .nome(colab.getEquipe().getSetor().getNome())
+                    .descricao(colab.getEquipe().getSetor().getDescricao())
+                    .status(colab.getEquipe().getSetor().getStatus())
+                    .build();
+        }
+        ColaboradorPerfilDTO.Equipe equipeDTO = null;
+        if (colab.getEquipe() != null) {
+            equipeDTO = ColaboradorPerfilDTO.Equipe.builder()
+                    .id(colab.getEquipe().getId())
+                    .nome(colab.getEquipe().getNome())
+                    .status(colab.getEquipe().getStatus())
+                    .setor(setorDTO)
+                    .build();
+        }
+
+        List<ColaboradorCompetencia> list = colaboradorCompetenciaRepository.findByColaboradorIdAndStatusTrue(colaboradorId);
+        List<ColaboradorPerfilDTO.ColaboradorCompetenciaFull> competencias = list.stream().map(cc ->
+                ColaboradorPerfilDTO.ColaboradorCompetenciaFull.builder()
+                        .id(cc.getId())
+                        .colaboradorId(colaboradorId)
+                        .competenciaId(cc.getCompetencia() != null ? cc.getCompetencia().getId() : null)
+                        .proeficiencia(cc.getProeficiencia())
+                        .ordem(cc.getOrdem())
+                        .competencia(cc.getCompetencia() == null ? null : ColaboradorPerfilDTO.CompetenciaItem.builder()
+                                .id(cc.getCompetencia().getId())
+                                .nome(cc.getCompetencia().getNome())
+                                .tipo(cc.getCompetencia().getTipo())
+                                .build())
+                        .build()
+        ).collect(Collectors.toList());
+
+        ColaboradorPerfilDTO dto = ColaboradorPerfilDTO.builder()
+                .id(colab.getId())
+                .nome(colab.getNome())
+                .sobrenome(colab.getSobrenome())
+                .email(colab.getEmail())
+                .status(colab.getStatus())
+                .role(colab.getRole() != null ? colab.getRole().name() : null)
+                .criadoEm(colab.getCriadoEm())
+                .atualizadoEm(colab.getAtualizadoEm())
+                .avatar(colab.getAvatar())
+                .capa(colab.getCapa())
+                .cargo(cargoDTO)
+                .equipe(equipeDTO)
+                .competencias(competencias)
+                .build();
+        return Optional.of(dto);
+    }
+
+    @Transactional
+    public boolean atualizarOrdemCompetenciasPerfil(Long colaboradorId, java.util.List<com.concord.proficio.presentation.viewmodel.PerfilCompetenciaOrderItemViewModel> items) {
+        Optional<Colaborador> optionalCol = colaboradorRepository.findById(colaboradorId);
+        if (optionalCol.isEmpty()) return false;
+
+        for (var it : items) {
+            Long itemId = it.getId();
+            Long competenciaId = it.getId_competencia();
+            Integer ordem = it.getOrdem();
+
+            ColaboradorCompetencia alvo = null;
+            if (itemId != null) {
+                var opt = colaboradorCompetenciaRepository.findById(itemId);
+                if (opt.isPresent() && opt.get().getColaborador() != null && colaboradorId.equals(opt.get().getColaborador().getId())) {
+                    alvo = opt.get();
+                }
+            }
+            if (alvo == null && competenciaId != null) {
+                alvo = colaboradorCompetenciaRepository.findByColaboradorIdAndCompetenciaId(colaboradorId, competenciaId).orElse(null);
+            }
+            if (alvo == null && competenciaId != null) {
+                // cria se não existir
+                Competencia comp = competenciaRepository.findById(competenciaId)
+                        .orElseThrow(() -> new IllegalArgumentException("Competencia não encontrada: " + competenciaId));
+                alvo = new ColaboradorCompetencia();
+                alvo.setColaborador(optionalCol.get());
+                alvo.setCompetencia(comp);
+                alvo.setProeficiencia(0);
+            }
+            if (alvo != null) {
+                if (ordem != null) alvo.setOrdem(ordem);
+                colaboradorCompetenciaRepository.save(alvo);
+            }
+        }
+        try {
+            Colaborador col = optionalCol.get();
+            col.setAtualizadoEm(java.time.LocalDateTime.now());
+            colaboradorRepository.save(col);
+        } catch (Exception ignored) {}
+        return true;
     }
 
     /**

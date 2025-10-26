@@ -1,6 +1,7 @@
 package com.concord.proficio.application.dto;
 
 import com.concord.proficio.domain.enums.GeneroEnum;
+import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class ColaboradorListDTO {
     private String email;
     private LocalDate dataNascimento;
     private GeneroEnum genero;
+    private ColaboradorRoleEnum role;
+    private String nomeCargo;
     private byte[] avatar;
     private byte[] capa;
     private LocalDateTime criadoEm;

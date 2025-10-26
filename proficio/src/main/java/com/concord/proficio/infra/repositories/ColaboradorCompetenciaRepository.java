@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ColaboradorCompetenciaRepository extends JpaRepository<ColaboradorCompetencia, Long> {
     List<ColaboradorCompetencia> findByColaboradorId(Long colaboradorId);
+    List<ColaboradorCompetencia> findByColaboradorIdAndStatusTrue(Long colaboradorId);
 
     Optional<ColaboradorCompetencia> findByColaboradorIdAndCompetenciaId(Long colaboradorId, Long competenciaId);
 }

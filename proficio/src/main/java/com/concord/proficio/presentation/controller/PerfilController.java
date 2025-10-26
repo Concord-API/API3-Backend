@@ -26,15 +26,16 @@ public class PerfilController {
         // Obter o ID do usuário logado
         Long colaboradorId = ((com.concord.proficio.domain.entities.Colaborador) authentication.getPrincipal()).getId();
         
-        // Converter ViewModel para DTO
+        byte[] avatarBytes = decodeDataUrlToBytes(request.getAvatar());
+        byte[] capaBytes = decodeDataUrlToBytes(request.getCapa());
         PerfilUpdateDTO perfilUpdate = PerfilUpdateDTO.builder()
                 .nome(request.getNome())
                 .sobrenome(request.getSobrenome())
                 .email(request.getEmail())
                 .dataNascimento(request.getDataNascimento())
                 .genero(request.getGenero())
-                .avatar(request.getAvatar())
-                .capa(request.getCapa())
+                .avatar(avatarBytes)
+                .capa(capaBytes)
                 .build();
         
         return colaboradorService.atualizarPerfil(colaboradorId, perfilUpdate)
@@ -51,5 +52,16 @@ public class PerfilController {
                         .atualizadoEm(dto.getAtualizadoEm())
                         .build()))
                 .orElse(ResponseEntity.notFound().build());
+    }
+    private byte[] decodeDataUrlToBytes(String maybeDataUrl) {
+        if (maybeDataUrl == null || maybeDataUrl.isBlank()) return null;
+        try {
+            String raw = maybeDataUrl.trim();
+            int commaIdx = raw.indexOf(',');
+            String base64 = (raw.startsWith("data:") && commaIdx > 0) ? raw.substring(commaIdx + 1) : raw;
+            return java.util.Base64.getDecoder().decode(base64);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
