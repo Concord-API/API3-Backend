@@ -64,7 +64,7 @@ public class Colaborador implements UserDetails {
 	@JoinColumn(name = "id_cargo", nullable = false)
 	private Cargo cargo;
 
-	@OneToMany(mappedBy = "colaborador")
+	@OneToMany(mappedBy = "gestor")
 	private List<Equipe> equipes = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
