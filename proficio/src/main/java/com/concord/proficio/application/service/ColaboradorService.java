@@ -146,6 +146,8 @@ public class ColaboradorService {
                         .genero(colaborador.getGenero())
                         .role(colaborador.getRole())
                         .nomeCargo(colaborador.getCargo() != null ? colaborador.getCargo().getNome() : null)
+                        .idEquipe(colaborador.getEquipe() != null ? colaborador.getEquipe().getId() : null)
+                        .idSetor(colaborador.getEquipe() != null && colaborador.getEquipe().getSetor() != null ? colaborador.getEquipe().getSetor().getId() : null)
                         .avatar(colaborador.getAvatar())
                         .capa(colaborador.getCapa())
                         .criadoEm(colaborador.getCriadoEm())

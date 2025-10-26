@@ -22,6 +22,8 @@ public class ColaboradorListResponseViewModel {
     private GeneroEnum genero;
     private String role;
     private String cargoNome;
+    private Long idEquipe;
+    private Long idSetor;
     private byte[] avatar;
     private byte[] capa;
     private LocalDateTime criadoEm;

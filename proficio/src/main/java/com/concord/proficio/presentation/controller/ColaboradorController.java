@@ -92,6 +92,8 @@ public class ColaboradorController {
                         .genero(dto.getGenero())
                         .role(dto.getRole() != null ? dto.getRole().name() : null)
                         .cargoNome(dto.getNomeCargo())
+                        .idEquipe(dto.getIdEquipe())
+                        .idSetor(dto.getIdSetor())
                         .avatar(dto.getAvatar())
                         .capa(dto.getCapa())
                         .criadoEm(dto.getCriadoEm())

@@ -23,6 +23,8 @@ public class ColaboradorListDTO {
     private GeneroEnum genero;
     private ColaboradorRoleEnum role;
     private String nomeCargo;
+    private Long idEquipe;
+    private Long idSetor;
     private byte[] avatar;
     private byte[] capa;
     private LocalDateTime criadoEm;
