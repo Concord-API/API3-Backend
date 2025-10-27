@@ -72,8 +72,8 @@ public class DatabaseSeeder {
             Colaborador gestor = colaboradorRepository.findByEmail("gestor@example.com").orElseGet(() -> {
                 Colaborador g = new Colaborador();
                 g.setCpf("11111111111");
-                g.setNome("Gestor");
-                g.setSobrenome("Padrão");
+                g.setNome("Victor");
+                g.setSobrenome("Nogueira");
                 g.setEmail("gestor@example.com");
                 g.setSenha(passwordEncoder.encode("123456"));
                 g.setRole(ColaboradorRoleEnum.Gestor);
@@ -94,8 +94,8 @@ public class DatabaseSeeder {
             if (colaboradorRepository.findByEmail("colaborador@example.com").isEmpty()) {
                 Colaborador c = new Colaborador();
                 c.setCpf("22222222222");
-                c.setNome("Colaborador");
-                c.setSobrenome("Padrão");
+                c.setNome("Joao");
+                c.setSobrenome("Andrade");
                 c.setEmail("colaborador@example.com");
                 c.setSenha(passwordEncoder.encode("123456"));
                 c.setRole(ColaboradorRoleEnum.Colaborador);
