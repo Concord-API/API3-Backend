@@ -8,6 +8,16 @@ import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateR
 import com.concord.proficio.presentation.viewmodel.PerfilUpdateRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.PerfilResponseViewModel;
 import com.concord.proficio.presentation.viewmodel.ColaboradorListResponseViewModel;
+import com.concord.proficio.presentation.viewmodel.ColaboradorCreateRequestViewModel;
+import com.concord.proficio.domain.entities.Cargo;
+import com.concord.proficio.domain.entities.Equipe;
+import com.concord.proficio.domain.entities.Colaborador;
+import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
+import com.concord.proficio.domain.enums.GeneroEnum;
+import com.concord.proficio.infra.repositories.CargoRepository;
+import com.concord.proficio.infra.repositories.EquipeRepository;
+import com.concord.proficio.infra.repositories.ColaboradorRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
@@ -19,9 +29,21 @@ import org.springframework.web.bind.annotation.*;
 public class ColaboradorController {
 
     private final ColaboradorService colaboradorService;
+    private final CargoRepository cargoRepository;
+    private final EquipeRepository equipeRepository;
+    private final ColaboradorRepository colaboradorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ColaboradorController(ColaboradorService colaboradorService) {
+    public ColaboradorController(ColaboradorService colaboradorService,
+                                 CargoRepository cargoRepository,
+                                 EquipeRepository equipeRepository,
+                                 ColaboradorRepository colaboradorRepository,
+                                 PasswordEncoder passwordEncoder) {
         this.colaboradorService = colaboradorService;
+        this.cargoRepository = cargoRepository;
+        this.equipeRepository = equipeRepository;
+        this.colaboradorRepository = colaboradorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -139,6 +161,48 @@ public class ColaboradorController {
                         .atualizadoEm(dto.getAtualizadoEm())
                         .build()))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<ColaboradorListResponseViewModel> criar(@jakarta.validation.Valid @RequestBody ColaboradorCreateRequestViewModel req) {
+        Cargo cargo = cargoRepository.findById(req.getIdCargo()).orElse(null);
+        Equipe equipe = equipeRepository.findById(req.getIdEquipe()).orElse(null);
+        if (cargo == null || equipe == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (colaboradorRepository.findByEmail(req.getEmail()).isPresent()) {
+            return ResponseEntity.status(409).build();
+        }
+        Colaborador novo = new Colaborador();
+        novo.setNome(req.getNome());
+        novo.setSobrenome(req.getSobrenome());
+        novo.setEmail(req.getEmail());
+        novo.setSenha(passwordEncoder.encode(req.getSenha()));
+        if (req.getGenero() != null) {
+            try { novo.setGenero(GeneroEnum.valueOf(req.getGenero())); } catch (Exception ignored) {}
+        }
+        try { novo.setRole(ColaboradorRoleEnum.valueOf(req.getRole())); } catch (Exception ignored) { novo.setRole(ColaboradorRoleEnum.Colaborador); }
+        novo.setStatus(req.getStatus() != null ? req.getStatus() : true);
+        novo.setCargo(cargo);
+        novo.setEquipe(equipe);
+        Colaborador salvo = colaboradorRepository.save(novo);
+
+        ColaboradorListResponseViewModel vm = ColaboradorListResponseViewModel.builder()
+                .id(salvo.getId())
+                .nome(salvo.getNome())
+                .sobrenome(salvo.getSobrenome())
+                .email(salvo.getEmail())
+                .genero(salvo.getGenero())
+                .role(salvo.getRole() != null ? salvo.getRole().name() : null)
+                .cargoNome(salvo.getCargo() != null ? salvo.getCargo().getNome() : null)
+                .idEquipe(salvo.getEquipe() != null ? salvo.getEquipe().getId() : null)
+                .idSetor(salvo.getEquipe() != null && salvo.getEquipe().getSetor() != null ? salvo.getEquipe().getSetor().getId() : null)
+                .avatar(salvo.getAvatar())
+                .capa(salvo.getCapa())
+                .criadoEm(salvo.getCriadoEm())
+                .atualizadoEm(salvo.getAtualizadoEm())
+                .build();
+        return ResponseEntity.status(201).body(vm);
     }
 
     private byte[] decodeDataUrlToBytes(String maybeDataUrl) {
