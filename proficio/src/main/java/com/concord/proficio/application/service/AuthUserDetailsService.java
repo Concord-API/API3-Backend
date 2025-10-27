@@ -18,7 +18,7 @@ public class AuthUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Colaborador colab = colaboradorRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-        return colab; // Colaborador implementa UserDetails
+        return colab;
     }
 }
 

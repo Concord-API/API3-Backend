@@ -1,18 +1,13 @@
 package com.concord.proficio.domain.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,8 +24,12 @@ public class Equipe {
 	@Column(name = "nome_equipe", nullable = false, length = 50)
 	private String nome;
 
-	@Column(name = "gerente", length = 50)
-	private String gerente;
+	@OneToMany(mappedBy = "equipe")
+	private List<Colaborador> colaboradores = new ArrayList<>();
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_gestor", nullable = true)
+	private Colaborador gestor;
 
 	@Column(name = "status", length = 1)
 	private Boolean status;
@@ -38,4 +37,5 @@ public class Equipe {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_setor", nullable = false)
 	private Setor setor;
+
 }

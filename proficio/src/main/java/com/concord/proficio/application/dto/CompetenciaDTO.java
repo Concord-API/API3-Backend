@@ -1,4 +1,4 @@
-package com.concord.proficio.presentation.dto;
+package com.concord.proficio.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +13,6 @@ public class CompetenciaDTO {
     private Long id;
     private String nome;
     private Byte tipo;
-    private Integer proeficiencia;
-    private Integer ordem;
 }
 
 

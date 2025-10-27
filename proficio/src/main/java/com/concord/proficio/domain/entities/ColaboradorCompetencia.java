@@ -42,4 +42,7 @@ public class ColaboradorCompetencia {
 	@Lob
 	@Column(name = "certificado")
 	private byte[] certificado;
+
+	@Column(name = "status", length = 1)
+	private Boolean status;
 }

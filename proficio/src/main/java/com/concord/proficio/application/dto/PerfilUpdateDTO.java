@@ -1,26 +1,23 @@
-package com.concord.proficio.presentation.dto;
+package com.concord.proficio.application.dto;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import com.concord.proficio.domain.enums.GeneroEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColaboradorResponseDTO {
-    private Long id;
+public class PerfilUpdateDTO {
     private String nome;
     private String sobrenome;
     private String email;
-    private String cpf;
     private LocalDate dataNascimento;
-    private Boolean status;
-    private List<CompetenciaDTO> competencias;
+    private GeneroEnum genero;
+    private byte[] avatar;
+    private byte[] capa;
 }
-
-

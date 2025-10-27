@@ -2,10 +2,12 @@ package com.concord.proficio.domain.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
+import com.concord.proficio.domain.enums.GeneroEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,6 +49,10 @@ public class Colaborador implements UserDetails {
 	@Column(name = "senha", nullable = false, length = 256)
 	private String senha;
 
+    @Enumerated(EnumType.ORDINAL)
+	@Column(name = "genero", nullable = false)
+	private GeneroEnum genero;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false, length = 50)
 	private ColaboradorRoleEnum role;
@@ -58,16 +64,19 @@ public class Colaborador implements UserDetails {
 	@JoinColumn(name = "id_cargo", nullable = false)
 	private Cargo cargo;
 
+	@OneToMany(mappedBy = "gestor")
+	private List<Equipe> equipes = new ArrayList<>();
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_equipe", nullable = false)
 	private Equipe equipe;
 
-	@Lob
-	@Column(name = "avatar")
+    @Lob
+    @Column(name = "avatar", columnDefinition = "LONGBLOB")
 	private byte[] avatar;
 
-	@Lob
-	@Column(name = "capa")
+    @Lob
+    @Column(name = "capa", columnDefinition = "LONGBLOB")
 	private byte[] capa;
 
 	@CreatedDate
@@ -81,7 +90,7 @@ public class Colaborador implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(this.role.getRole()));
+		return List.of(new SimpleGrantedAuthority(this.role.name()));
 	}
 
 	@Override
