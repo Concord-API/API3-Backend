@@ -1,7 +1,6 @@
 package com.concord.proficio.infra.repositories;
 
 import com.concord.proficio.domain.entities.Equipe;
-import com.concord.proficio.domain.entities.Setor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +18,7 @@ public interface EquipeRepository
 
     List<Equipe> findByStatusTrue();
 
-    @Query("select e from Setor e where e.status = true and (:q is null or lower(s.nome) like lower(concat('%', :q, '%')))")
+    @Query("select e from Equipe e where e.status = true and (:q is null or lower(e.nome) like lower(concat('%', :q, '%')))")
     List<Equipe> searchActive(@Param("q") String q);
 
 }

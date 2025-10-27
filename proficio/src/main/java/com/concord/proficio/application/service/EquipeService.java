@@ -1,6 +1,5 @@
 package com.concord.proficio.application.service;
 
-import com.concord.proficio.domain.entities.Colaborador;
 import com.concord.proficio.domain.entities.Equipe;
 import com.concord.proficio.domain.entities.Setor;
 import com.concord.proficio.infra.repositories.SetorRepository;
@@ -29,6 +28,28 @@ public class EquipeService {
 
     public List<Equipe> listarTodos() {
         return equipeRepository.findByStatusTrue();
+    }
+
+    public List<Equipe> buscar(String q) { 
+        return buscar(q, "active");
+    }
+
+    public List<Equipe> buscar(String q, String status) {
+        String query = (q == null || q.isBlank()) ? null : q.toLowerCase();
+        List<Equipe> base;
+        if ("all".equalsIgnoreCase(status)) {
+            base = equipeRepository.findAll();
+        } else if ("inactive".equalsIgnoreCase(status)) {
+            base = equipeRepository.findAll().stream()
+                    .filter(e -> Boolean.FALSE.equals(e.getStatus()))
+                    .toList();
+        } else {
+            base = equipeRepository.findByStatusTrue();
+        }
+        if (query == null) return base;
+        return base.stream()
+                .filter(e -> e.getNome() != null && e.getNome().toLowerCase().contains(query))
+                .toList();
     }
 
     public Optional<Equipe> buscarPorNome(String nome) {
@@ -78,9 +99,7 @@ public class EquipeService {
         return true;
     }
 
-    public List<Equipe> buscar(String q) {
-        return equipeRepository.searchActive(q == null || q.isBlank() ? null : q);
-    }
+    
 
     public long contarColaboradoresAtivosDaEquipe(Long equipeId) {
         return colaboradorRepository.countByEquipeIdAndStatusTrue(equipeId);

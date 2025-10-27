@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CompetenciaRepository extends JpaRepository<Competencia, Long> {
+    java.util.List<Competencia> findByStatusTrue();
 }

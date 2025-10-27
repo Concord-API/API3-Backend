@@ -20,6 +20,10 @@ public class ColaboradorListResponseViewModel {
     private String email;
     private LocalDate dataNascimento;
     private GeneroEnum genero;
+    private String role;
+    private String cargoNome;
+    private Long idEquipe;
+    private Long idSetor;
     private byte[] avatar;
     private byte[] capa;
     private LocalDateTime criadoEm;

@@ -18,6 +18,7 @@ public class PerfilUpdateRequestViewModel {
     private String email;
     private LocalDate dataNascimento;
     private GeneroEnum genero;
-    private byte[] avatar;
-    private byte[] capa;
+    private String avatar;
+    private String capa;
+    private java.util.List<PerfilCompetenciaOrderItemViewModel> competencias;
 }

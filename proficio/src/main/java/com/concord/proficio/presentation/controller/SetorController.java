@@ -22,8 +22,9 @@ public class SetorController {
 
 	@GetMapping
     public ResponseEntity<List<SetorResponseViewModel>> listar(
-                @RequestParam(value = "q", required = false) String q) {
-        List<SetorResponseViewModel> vms = setorService.buscar(q).stream()
+                @RequestParam(value = "q", required = false) String q,
+                @RequestParam(value = "status", required = false, defaultValue = "active") String status) {
+        List<SetorResponseViewModel> vms = setorService.buscar(q, status).stream()
 				.map(s -> SetorResponseViewModel.builder()
 						.id(s.getId())
 						.nome(s.getNome())

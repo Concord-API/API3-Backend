@@ -64,19 +64,19 @@ public class Colaborador implements UserDetails {
 	@JoinColumn(name = "id_cargo", nullable = false)
 	private Cargo cargo;
 
-	@OneToMany(mappedBy = "colaborador")
+	@OneToMany(mappedBy = "gestor")
 	private List<Equipe> equipes = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_equipe", nullable = false)
 	private Equipe equipe;
 
-	@Lob
-	@Column(name = "avatar")
+    @Lob
+    @Column(name = "avatar", columnDefinition = "LONGBLOB")
 	private byte[] avatar;
 
-	@Lob
-	@Column(name = "capa")
+    @Lob
+    @Column(name = "capa", columnDefinition = "LONGBLOB")
 	private byte[] capa;
 
 	@CreatedDate

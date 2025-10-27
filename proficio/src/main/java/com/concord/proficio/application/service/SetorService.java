@@ -75,7 +75,25 @@ public class SetorService {
 	}
 
     public List<Setor> buscar(String q) {
-        return setorRepository.searchActive(q == null || q.isBlank() ? null : q);
+        return buscar(q, "active");
+    }
+
+    public List<Setor> buscar(String q, String status) {
+        String query = (q == null || q.isBlank()) ? null : q.toLowerCase();
+        List<Setor> base;
+        if ("all".equalsIgnoreCase(status)) {
+            base = setorRepository.findAll();
+        } else if ("inactive".equalsIgnoreCase(status)) {
+            base = setorRepository.findAll().stream()
+                    .filter(s -> Boolean.FALSE.equals(s.getStatus()))
+                    .toList();
+        } else {
+            base = setorRepository.findByStatusTrue();
+        }
+        if (query == null) return base;
+        return base.stream()
+                .filter(s -> s.getNome() != null && s.getNome().toLowerCase().contains(query))
+                .toList();
     }
 
     public long contarEquipesAtivasDoSetor(Long setorId) {
