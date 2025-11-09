@@ -236,6 +236,7 @@ public class ColaboradorService {
                 .email(colab.getEmail())
                 .status(colab.getStatus())
                 .role(colab.getRole() != null ? colab.getRole().name() : null)
+                    .dataNascimento(colab.getDataNascimento())
                 .criadoEm(colab.getCriadoEm())
                 .atualizadoEm(colab.getAtualizadoEm())
                 .avatar(colab.getAvatar())
