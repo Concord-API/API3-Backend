@@ -18,6 +18,7 @@ public class ColaboradorPerfilResponseViewModel {
     private String email;
     private Boolean status;
     private String role;
+    private String data_nasci;
     private String criado_em;
     private String atualizado_em;
     private String avatar;

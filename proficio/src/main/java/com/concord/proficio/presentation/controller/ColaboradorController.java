@@ -178,6 +178,9 @@ public class ColaboradorController {
         novo.setSobrenome(req.getSobrenome());
         novo.setEmail(req.getEmail());
         novo.setSenha(passwordEncoder.encode(req.getSenha()));
+        if (req.getDataNascimento() != null) {
+            novo.setDataNascimento(req.getDataNascimento());
+        }
         if (req.getGenero() != null) {
             try { novo.setGenero(GeneroEnum.valueOf(req.getGenero())); } catch (Exception ignored) {}
         }
@@ -192,6 +195,7 @@ public class ColaboradorController {
                 .nome(salvo.getNome())
                 .sobrenome(salvo.getSobrenome())
                 .email(salvo.getEmail())
+                .dataNascimento(salvo.getDataNascimento())
                 .genero(salvo.getGenero())
                 .role(salvo.getRole() != null ? salvo.getRole().name() : null)
                 .cargoNome(salvo.getCargo() != null ? salvo.getCargo().getNome() : null)
@@ -283,6 +287,7 @@ public class ColaboradorController {
                 .email(dto.getEmail())
                 .status(dto.getStatus())
                 .role(dto.getRole())
+                .data_nasci(dto.getDataNascimento() != null ? dto.getDataNascimento().toString() : null)
                 .criado_em(dto.getCriadoEm() != null ? dto.getCriadoEm().toString() : null)
                 .atualizado_em(dto.getAtualizadoEm() != null ? dto.getAtualizadoEm().toString() : null)
                 .avatar(dto.getAvatar() != null ? Base64.getEncoder().encodeToString(dto.getAvatar()) : null)
