@@ -20,9 +20,6 @@ public class ColaboradorCreateRequestViewModel {
 
     private String genero;
 
-    @NotBlank
-    private String role;
-
     @NotNull
     private Long idEquipe;
     @NotNull

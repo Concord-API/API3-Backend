@@ -11,6 +11,7 @@ public class CargoResponseViewModel {
     private Long id_cargo;
     private String nome_cargo;
     private String desc_cargo;
+    private String role;
     private Boolean status;
     private Long id_setor;
 }

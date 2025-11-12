@@ -29,18 +29,33 @@ public class DatabaseSeeder {
                     ));
 
             // ---- CARGO ----
-            Cargo cargoDiretor = cargoRepository.findByNome("Diretor de Tecnologia")
-                    .orElseGet(() -> cargoRepository.save(
-                            new Cargo(null, "Diretor de Tecnologia", "Responsável estratégico de TI", true, setorAdmin)
-                    ));
-            Cargo cargoGestor = cargoRepository.findByNome("Gestor de Projetos")
-                    .orElseGet(() -> cargoRepository.save(
-                            new Cargo(null, "Gestor de Projetos", "Coordena projetos do setor", true, setorAdmin)
-                    ));
-            Cargo cargoColaborador = cargoRepository.findByNome("Desenvolvedor Backend")
-                    .orElseGet(() -> cargoRepository.save(
-                            new Cargo(null, "Desenvolvedor Backend", "Desenvolvimento de APIs e serviços", true, setorAdmin)
-                    ));
+            Cargo cargoDiretor = cargoRepository.findByNome("Diretor de Tecnologia").orElseGet(() -> {
+                Cargo c = new Cargo();
+                c.setNome("Diretor de Tecnologia");
+                c.setDescricao("Responsável estratégico de TI");
+                c.setRole(ColaboradorRoleEnum.Diretor);
+                c.setStatus(true);
+                c.setSetor(setorAdmin);
+                return cargoRepository.save(c);
+            });
+            Cargo cargoGestor = cargoRepository.findByNome("Gestor de Projetos").orElseGet(() -> {
+                Cargo c = new Cargo();
+                c.setNome("Gestor de Projetos");
+                c.setDescricao("Coordena projetos do setor");
+                c.setRole(ColaboradorRoleEnum.Gestor);
+                c.setStatus(true);
+                c.setSetor(setorAdmin);
+                return cargoRepository.save(c);
+            });
+            Cargo cargoColaborador = cargoRepository.findByNome("Desenvolvedor Backend").orElseGet(() -> {
+                Cargo c = new Cargo();
+                c.setNome("Desenvolvedor Backend");
+                c.setDescricao("Desenvolvimento de APIs e serviços");
+                c.setRole(ColaboradorRoleEnum.Colaborador);
+                c.setStatus(true);
+                c.setSetor(setorAdmin);
+                return cargoRepository.save(c);
+            });
 
             // ---- EQUIPE ----
             Equipe equipeAdmin = equipeRepository.findByNome("Equipe Administrativa")
@@ -56,7 +71,6 @@ public class DatabaseSeeder {
                 admin.setSobrenome("Cordeiro");
                 admin.setEmail("diretor@example.com");
                 admin.setSenha(passwordEncoder.encode("123456"));
-                admin.setRole(ColaboradorRoleEnum.Diretor);
                 admin.setStatus(true);
                 admin.setCargo(cargoDiretor);
                 admin.setEquipe(equipeAdmin);
@@ -76,7 +90,6 @@ public class DatabaseSeeder {
                 g.setSobrenome("Nogueira");
                 g.setEmail("gestor@example.com");
                 g.setSenha(passwordEncoder.encode("123456"));
-                g.setRole(ColaboradorRoleEnum.Gestor);
                 g.setStatus(true);
                 g.setCargo(cargoGestor);
                 g.setEquipe(equipeAdmin);
@@ -98,7 +111,6 @@ public class DatabaseSeeder {
                 c.setSobrenome("Andrade");
                 c.setEmail("colaborador@example.com");
                 c.setSenha(passwordEncoder.encode("123456"));
-                c.setRole(ColaboradorRoleEnum.Colaborador);
                 c.setStatus(true);
                 c.setCargo(cargoColaborador);
                 c.setEquipe(equipeAdmin);

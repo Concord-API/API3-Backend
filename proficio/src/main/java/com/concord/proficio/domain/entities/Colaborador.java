@@ -53,14 +53,11 @@ public class Colaborador implements UserDetails {
 	@Column(name = "genero", nullable = false)
 	private GeneroEnum genero;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "role", nullable = false, length = 50)
-	private ColaboradorRoleEnum role;
 
 	@Column(name = "status", length = 1)
 	private Boolean status;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_cargo", nullable = false)
 	private Cargo cargo;
 
@@ -90,12 +87,20 @@ public class Colaborador implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(this.role.name()));
+		ColaboradorRoleEnum effectiveRole = getRole();
+		return List.of(new SimpleGrantedAuthority(effectiveRole.name()));
 	}
 
 	@Override
 	public String getPassword() {
 		return senha;
+	}
+
+	public ColaboradorRoleEnum getRole() {
+		if (this.cargo != null && this.cargo.getRole() != null) {
+			return this.cargo.getRole();
+		}
+		return ColaboradorRoleEnum.Colaborador;
 	}
 
 	@Override
