@@ -29,4 +29,7 @@ public class Competencia {
 	
 	@Column(name = "status", length = 1)
 	private Boolean status;
+
+	@Column(name = "aprovada", nullable = false)
+	private Boolean aprovada = false;
 }
