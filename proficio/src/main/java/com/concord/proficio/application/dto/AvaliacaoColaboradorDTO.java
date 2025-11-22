@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,9 +18,12 @@ public class AvaliacaoColaboradorDTO {
     private Long avaliadoId;
     private String avaliadoNome;
     private String resumo;
+    private Integer nota;
     private Long competenciaId;
     private String competenciaNome;
     private Boolean status;
     private Boolean publico;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 }
 

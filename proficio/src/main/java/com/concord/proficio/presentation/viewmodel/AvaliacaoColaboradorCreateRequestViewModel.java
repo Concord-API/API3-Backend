@@ -13,6 +13,8 @@ public class AvaliacaoColaboradorCreateRequestViewModel {
 
     private String resumo;
 
+    private Integer nota;
+
     @NotNull(message = "ID da competência é obrigatório")
     private Long competenciaId;
 
