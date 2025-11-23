@@ -35,4 +35,14 @@ public class CompetenciaService {
         competencia.setStatus(true);
         return competenciaRepository.save(competencia);
     }
+
+    @Transactional
+    public boolean aprovar(Long id) {
+        return competenciaRepository.findById(id)
+                .map(c -> {
+                    c.setAprovada(true);
+                    competenciaRepository.save(c);
+                    return true;
+                }).orElse(false);
+    }
 }

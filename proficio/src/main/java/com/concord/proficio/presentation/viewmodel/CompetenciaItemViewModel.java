@@ -1,4 +1,4 @@
-package com.concord.proficio.application.dto;
+package com.concord.proficio.presentation.viewmodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColaboradorCompetenciaDTO {
-    private Long id;
-    private Long idCompetencia;
+public class CompetenciaItemViewModel {
+    private Long id_competencia;
     private String nome;
     private Byte tipo;
-    private Integer proeficiencia;
-    private Integer ordem;
 }
-
-

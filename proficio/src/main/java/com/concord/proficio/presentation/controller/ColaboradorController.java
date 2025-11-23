@@ -3,12 +3,7 @@ package com.concord.proficio.presentation.controller;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.dto.PerfilUpdateDTO;
 import com.concord.proficio.application.service.ColaboradorService;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateRequestViewModel;
-import com.concord.proficio.presentation.viewmodel.PerfilUpdateRequestViewModel;
-import com.concord.proficio.presentation.viewmodel.PerfilResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorListResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCreateRequestViewModel;
+import com.concord.proficio.presentation.viewmodel.*;
 import com.concord.proficio.domain.entities.Cargo;
 import com.concord.proficio.domain.entities.Equipe;
 import com.concord.proficio.domain.entities.Colaborador;
@@ -21,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
-import com.concord.proficio.presentation.viewmodel.ColaboradorPerfilResponseViewModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,6 +47,7 @@ public class ColaboradorController {
                 .map(dtos -> ResponseEntity.ok(
                         dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
                                 .id(dto.getId())
+                                .idCompetencia(dto.getIdCompetencia())
                                 .nome(dto.getNome())
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
@@ -82,6 +77,7 @@ public class ColaboradorController {
                 .map(dtos -> ResponseEntity.ok(
                         dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
                                 .id(dto.getId())
+                                .idCompetencia(dto.getIdCompetencia())
                                 .nome(dto.getNome())
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
@@ -229,27 +225,27 @@ public class ColaboradorController {
     }
 
     private ColaboradorPerfilResponseViewModel mapToVM(ColaboradorPerfilDTO dto) {
-        ColaboradorPerfilResponseViewModel.CargoVM cargoVM = null;
+        CargoResponseViewModel cargoVM = null;
         if (dto.getCargo() != null) {
-            cargoVM = ColaboradorPerfilResponseViewModel.CargoVM.builder()
+            cargoVM = CargoResponseViewModel.builder()
                     .id_cargo(dto.getCargo().getId())
                     .nome_cargo(dto.getCargo().getNome())
                     .desc_cargo(dto.getCargo().getDescricao())
                     .status(dto.getCargo().getStatus())
                     .build();
         }
-        ColaboradorPerfilResponseViewModel.SetorVM setorVM = null;
+        SetorSimpleViewModel setorVM = null;
         if (dto.getEquipe() != null && dto.getEquipe().getSetor() != null) {
-            setorVM = ColaboradorPerfilResponseViewModel.SetorVM.builder()
+            setorVM = SetorSimpleViewModel.builder()
                     .id_setor(dto.getEquipe().getSetor().getId())
                     .nome_setor(dto.getEquipe().getSetor().getNome())
                     .desc_setor(dto.getEquipe().getSetor().getDescricao())
                     .status(dto.getEquipe().getSetor().getStatus())
                     .build();
         }
-        ColaboradorPerfilResponseViewModel.EquipeVM equipeVM = null;
+        EquipeSimpleViewModel equipeVM = null;
         if (dto.getEquipe() != null) {
-            equipeVM = ColaboradorPerfilResponseViewModel.EquipeVM.builder()
+            equipeVM = EquipeSimpleViewModel.builder()
                     .id_equipe(dto.getEquipe().getId())
                     .nome_equipe(dto.getEquipe().getNome())
                     .status(dto.getEquipe().getStatus())
@@ -258,18 +254,18 @@ public class ColaboradorController {
                     .build();
         }
 
-        List<ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM> comps = new ArrayList<>();
+        List<ColaboradorCompetenciaFullViewModel> comps = new ArrayList<>();
         if (dto.getCompetencias() != null) {
             for (var cc : dto.getCompetencias()) {
-                ColaboradorPerfilResponseViewModel.CompetenciaItemVM compVM = null;
+                CompetenciaItemViewModel compVM = null;
                 if (cc.getCompetencia() != null) {
-                    compVM = ColaboradorPerfilResponseViewModel.CompetenciaItemVM.builder()
+                    compVM = CompetenciaItemViewModel.builder()
                             .id_competencia(cc.getCompetencia().getId())
                             .nome(cc.getCompetencia().getNome())
                             .tipo(cc.getCompetencia().getTipo())
                             .build();
                 }
-                comps.add(ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM.builder()
+                comps.add(ColaboradorCompetenciaFullViewModel.builder()
                         .id(cc.getId())
                         .id_colaborador(dto.getId())
                         .id_competencia(cc.getCompetenciaId())
