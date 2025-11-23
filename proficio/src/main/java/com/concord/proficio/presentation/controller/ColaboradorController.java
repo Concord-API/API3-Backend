@@ -7,7 +7,6 @@ import com.concord.proficio.presentation.viewmodel.*;
 import com.concord.proficio.domain.entities.Cargo;
 import com.concord.proficio.domain.entities.Equipe;
 import com.concord.proficio.domain.entities.Colaborador;
-import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
 import com.concord.proficio.domain.enums.GeneroEnum;
 import com.concord.proficio.infra.repositories.CargoRepository;
 import com.concord.proficio.infra.repositories.EquipeRepository;
@@ -180,7 +179,6 @@ public class ColaboradorController {
         if (req.getGenero() != null) {
             try { novo.setGenero(GeneroEnum.valueOf(req.getGenero())); } catch (Exception ignored) {}
         }
-        try { novo.setRole(ColaboradorRoleEnum.valueOf(req.getRole())); } catch (Exception ignored) { novo.setRole(ColaboradorRoleEnum.Colaborador); }
         novo.setStatus(req.getStatus() != null ? req.getStatus() : true);
         novo.setCargo(cargo);
         novo.setEquipe(equipe);

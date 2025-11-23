@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class CargoResponseViewModel {
-    private Long id_cargo;
-    private String nome_cargo;
-    private String desc_cargo;
-    private String role;
+public class SquadResponseViewModel {
+    private Long id;
+    private String nome;
+    private String descricao;
     private Boolean status;
-    private Long id_setor;
+    private Long liderId;
+    private Long membrosCount;
 }
 
 
