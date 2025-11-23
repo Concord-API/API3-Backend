@@ -9,8 +9,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class ColaboradorCompetenciaResponseViewModel {
     private Long id;
+    private Long idCompetencia;
     private String nome;
     private Byte tipo;
+    private Boolean aprovada;
     private Integer proeficiencia;
     private Integer ordem;
 }

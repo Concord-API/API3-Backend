@@ -11,6 +11,7 @@ public class CompetenciaResponseViewModel {
     private Long id;
     private String nome;
     private Byte tipo;
+    private Boolean aprovada;
 }
 
 

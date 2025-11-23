@@ -28,6 +28,7 @@ public class CompetenciaController {
                         .id(c.getId())
                         .nome(c.getNome())
                         .tipo(c.getTipo())
+                        .aprovada(c.getAprovada())
                         .build())
                 .collect(Collectors.toList());
         return ResponseEntity.ok(vms);
@@ -44,8 +45,17 @@ public class CompetenciaController {
                 .id(criado.getId())
                 .nome(criado.getNome())
                 .tipo(criado.getTipo())
+                .aprovada(criado.getAprovada())
                 .build();
         return ResponseEntity.status(201).body(vm);
+    }
+
+    @PatchMapping("/{id}/aprovar")
+    public ResponseEntity<Void> aprovar(@PathVariable Long id) {
+        if (competenciaService.aprovar(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

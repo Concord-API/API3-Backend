@@ -44,7 +44,8 @@ public class ColaboradorService {
         List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorIdAndStatusTrue(colaboradorId);
         List<ColaboradorCompetenciaDTO> dtos = competencias.stream()
                 .map(cc -> ColaboradorCompetenciaDTO.builder()
-                        .id(cc.getCompetencia().getId())
+                        .id(cc.getId())
+                        .idCompetencia(cc.getCompetencia().getId())
                         .nome(cc.getCompetencia().getNome())
                         .tipo(cc.getCompetencia().getTipo())
                         .proeficiencia(cc.getProeficiencia())
