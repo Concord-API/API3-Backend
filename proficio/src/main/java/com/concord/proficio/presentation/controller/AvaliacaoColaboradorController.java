@@ -71,7 +71,7 @@ public class AvaliacaoColaboradorController {
         
         List<AvaliacaoColaboradorDTO> dtos;
         
-        if (ColaboradorRoleEnum.Diretor.equals(colaboradorLogado.getRole())) {
+        if (ColaboradorRoleEnum.DIRETOR.equals(colaboradorLogado.getRole())) {
             dtos = avaliacaoColaboradorService.listarTodas();
         } else {
             dtos = avaliacaoColaboradorService.listarPorColaborador(colaboradorLogado.getId());

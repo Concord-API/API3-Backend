@@ -41,7 +41,7 @@ public class AuthController {
                 String.valueOf(principal.getId()),
                 (principal.getNome() + " " + principal.getSobrenome()).trim(),
                 principal.getEmail(),
-                principal.getRole().name()
+                principal.getRole().getValue()
         );
         return ResponseEntity.ok(new AuthResponseViewModel(token, payload));
     }

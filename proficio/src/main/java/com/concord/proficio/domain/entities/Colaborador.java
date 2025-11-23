@@ -100,7 +100,7 @@ public class Colaborador implements UserDetails {
 		if (this.cargo != null && this.cargo.getRole() != null) {
 			return this.cargo.getRole();
 		}
-		return ColaboradorRoleEnum.Colaborador;
+		return ColaboradorRoleEnum.COLABORADOR;
 	}
 
 	@Override
