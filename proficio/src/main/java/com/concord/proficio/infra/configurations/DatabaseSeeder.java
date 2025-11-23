@@ -33,7 +33,7 @@ public class DatabaseSeeder {
                 Cargo c = new Cargo();
                 c.setNome("Diretor de Tecnologia");
                 c.setDescricao("Responsável estratégico de TI");
-                c.setRole(ColaboradorRoleEnum.Diretor);
+                c.setRole(ColaboradorRoleEnum.DIRETOR);
                 c.setStatus(true);
                 c.setSetor(setorAdmin);
                 return cargoRepository.save(c);
@@ -42,7 +42,7 @@ public class DatabaseSeeder {
                 Cargo c = new Cargo();
                 c.setNome("Gestor de Projetos");
                 c.setDescricao("Coordena projetos do setor");
-                c.setRole(ColaboradorRoleEnum.Gestor);
+                c.setRole(ColaboradorRoleEnum.GESTOR);
                 c.setStatus(true);
                 c.setSetor(setorAdmin);
                 return cargoRepository.save(c);
@@ -51,7 +51,7 @@ public class DatabaseSeeder {
                 Cargo c = new Cargo();
                 c.setNome("Desenvolvedor Backend");
                 c.setDescricao("Desenvolvimento de APIs e serviços");
-                c.setRole(ColaboradorRoleEnum.Colaborador);
+                c.setRole(ColaboradorRoleEnum.COLABORADOR);
                 c.setStatus(true);
                 c.setSetor(setorAdmin);
                 return cargoRepository.save(c);
@@ -74,7 +74,7 @@ public class DatabaseSeeder {
                 admin.setStatus(true);
                 admin.setCargo(cargoDiretor);
                 admin.setEquipe(equipeAdmin);
-                admin.setGenero(GeneroEnum.Masculino);
+                admin.setGenero(GeneroEnum.MASCULINO);
                 Colaborador adminSaved = colaboradorRepository.save(admin);
                 if (setorAdmin.getDiretor() == null) {
                     setorAdmin.setDiretor(adminSaved);
@@ -93,7 +93,7 @@ public class DatabaseSeeder {
                 g.setStatus(true);
                 g.setCargo(cargoGestor);
                 g.setEquipe(equipeAdmin);
-                g.setGenero(GeneroEnum.Masculino);
+                g.setGenero(GeneroEnum.MASCULINO);
                 return colaboradorRepository.save(g);
             });
 
@@ -114,7 +114,7 @@ public class DatabaseSeeder {
                 c.setStatus(true);
                 c.setCargo(cargoColaborador);
                 c.setEquipe(equipeAdmin);
-                c.setGenero(GeneroEnum.Masculino);
+                c.setGenero(GeneroEnum.MASCULINO);
                 colaboradorRepository.save(c);
             }
         };
