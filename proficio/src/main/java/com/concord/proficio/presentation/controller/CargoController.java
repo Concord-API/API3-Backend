@@ -20,28 +20,28 @@ public class CargoController {
 
 	public CargoController(CargoService cargoService) {
 		this.cargoService = cargoService;
-	}
+    }
 
-	@GetMapping
-	public ResponseEntity<List<CargoResponseViewModel>> listar(
+    @GetMapping
+    public ResponseEntity<List<CargoResponseViewModel>> listar(
 			@RequestParam(value = "q", required = false) String q,
 			@RequestParam(value = "status", required = false, defaultValue = "active") String status,
 			@RequestParam(value = "setorId", required = false) Long setorId
-	) {
+    ) {
 		List<Cargo> cargos = cargoService.buscar(q, status);
-		var vms = cargos.stream()
-				.filter(c -> setorId == null || (c.getSetor() != null && setorId.equals(c.getSetor().getId())))
-				.map(c -> CargoResponseViewModel.builder()
-						.id_cargo(c.getId())
-						.nome_cargo(c.getNome())
-						.desc_cargo(c.getDescricao())
+        var vms = cargos.stream()
+                .filter(c -> setorId == null || (c.getSetor() != null && setorId.equals(c.getSetor().getId())))
+                .map(c -> CargoResponseViewModel.builder()
+                        .id_cargo(c.getId())
+                        .nome_cargo(c.getNome())
+                        .desc_cargo(c.getDescricao())
 						.role(c.getRole() != null ? c.getRole().name() : null)
-						.status(c.getStatus())
-						.id_setor(c.getSetor() != null ? c.getSetor().getId() : null)
-						.build())
-				.toList();
-		return ResponseEntity.ok(vms);
-	}
+                        .status(c.getStatus())
+                        .id_setor(c.getSetor() != null ? c.getSetor().getId() : null)
+                        .build())
+                .toList();
+        return ResponseEntity.ok(vms);
+    }
 
 	@PostMapping
 	public ResponseEntity<CargoResponseViewModel> criar(@Valid @RequestBody CargoCreateRequestViewModel req) {
