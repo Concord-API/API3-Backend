@@ -31,7 +31,7 @@ public class AvaliacaoColaboradorService {
 
     @Transactional
     public Optional<AvaliacaoColaboradorDTO> criar(Long avaliadorId, Long avaliadoId, String resumo, 
-                                                   Long competenciaId, Boolean status, Boolean publico) {
+                                                   Long competenciaId, Boolean status, Boolean publico, Integer nota) {
         Colaborador avaliador = colaboradorRepository.findById(avaliadorId)
                 .orElseThrow(() -> new IllegalArgumentException("Avaliador não encontrado com ID: " + avaliadorId));
         
@@ -45,6 +45,7 @@ public class AvaliacaoColaboradorService {
         avaliacao.setAvaliador(avaliador);
         avaliacao.setAvaliado(avaliado);
         avaliacao.setResumo(resumo);
+        avaliacao.setNota(nota);
         avaliacao.setCompetencia(competencia);
         avaliacao.setStatus(status != null ? status : true);
         avaliacao.setPublico(publico != null ? publico : false);
@@ -55,7 +56,7 @@ public class AvaliacaoColaboradorService {
 
     @Transactional
     public Optional<AvaliacaoColaboradorDTO> atualizar(Long id, String resumo, Long competenciaId, 
-                                                        Boolean status, Boolean publico) {
+                                                        Boolean status, Boolean publico, Integer nota) {
         Optional<AvaliacaoColaborador> optional = avaliacaoColaboradorRepository.findById(id);
         if (optional.isEmpty()) {
             return Optional.empty();
@@ -65,6 +66,10 @@ public class AvaliacaoColaboradorService {
 
         if (resumo != null) {
             avaliacao.setResumo(resumo);
+        }
+
+        if (nota != null) {
+            avaliacao.setNota(nota);
         }
 
         if (competenciaId != null) {
@@ -83,6 +88,12 @@ public class AvaliacaoColaboradorService {
 
         AvaliacaoColaborador atualizada = avaliacaoColaboradorRepository.save(avaliacao);
         return Optional.of(mapToDTO(atualizada));
+    }
+
+    public Optional<AvaliacaoColaboradorDTO> buscarPorId(Long id) {
+        return avaliacaoColaboradorRepository.findById(id)
+                .filter(a -> Boolean.TRUE.equals(a.getStatus()))
+                .map(this::mapToDTO);
     }
 
     public List<AvaliacaoColaboradorDTO> listarPorColaborador(Long colaboradorId) {
@@ -112,10 +123,13 @@ public class AvaliacaoColaboradorService {
                         ? (avaliacao.getAvaliado().getNome() + " " + avaliacao.getAvaliado().getSobrenome()).trim() 
                         : null)
                 .resumo(avaliacao.getResumo())
+                .nota(avaliacao.getNota())
                 .competenciaId(avaliacao.getCompetencia() != null ? avaliacao.getCompetencia().getId() : null)
                 .competenciaNome(avaliacao.getCompetencia() != null ? avaliacao.getCompetencia().getNome() : null)
                 .status(avaliacao.getStatus())
                 .publico(avaliacao.getPublico())
+                .criadoEm(avaliacao.getCriadoEm())
+                .atualizadoEm(avaliacao.getAtualizadoEm())
                 .build();
     }
 }

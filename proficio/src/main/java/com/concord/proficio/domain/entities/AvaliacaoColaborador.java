@@ -2,6 +2,7 @@ package com.concord.proficio.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,11 +14,17 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "avaliacao_colaborador")
 public class AvaliacaoColaborador {
 	@Id
@@ -37,6 +44,9 @@ public class AvaliacaoColaborador {
 	@Column(name = "resumo", columnDefinition = "TEXT")
 	private String resumo;
 
+	@Column(name = "nota")
+	private Integer nota;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_competencia", nullable = false)
 	private Competencia competencia;
@@ -46,5 +56,13 @@ public class AvaliacaoColaborador {
 
 	@Column(name = "publico", nullable = false)
 	private Boolean publico;
+
+	@CreatedDate
+	@Column(name = "criado_em", updatable = false)
+	private LocalDateTime criadoEm;
+
+	@LastModifiedDate
+	@Column(name = "atualizado_em")
+	private LocalDateTime atualizadoEm;
 }
 
