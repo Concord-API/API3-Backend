@@ -3,25 +3,21 @@ package com.concord.proficio.presentation.controller;
 import com.concord.proficio.application.dto.ColaboradorCompetenciaUpdateItemDTO;
 import com.concord.proficio.application.dto.PerfilUpdateDTO;
 import com.concord.proficio.application.service.ColaboradorService;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCompetenciaUpdateRequestViewModel;
-import com.concord.proficio.presentation.viewmodel.PerfilUpdateRequestViewModel;
-import com.concord.proficio.presentation.viewmodel.PerfilResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorListResponseViewModel;
-import com.concord.proficio.presentation.viewmodel.ColaboradorCreateRequestViewModel;
+import com.concord.proficio.presentation.viewmodel.*;
 import com.concord.proficio.domain.entities.Cargo;
 import com.concord.proficio.domain.entities.Equipe;
 import com.concord.proficio.domain.entities.Colaborador;
-import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
 import com.concord.proficio.domain.enums.GeneroEnum;
 import com.concord.proficio.infra.repositories.CargoRepository;
 import com.concord.proficio.infra.repositories.EquipeRepository;
 import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import java.util.*;
 import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
-import com.concord.proficio.presentation.viewmodel.ColaboradorPerfilResponseViewModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,10 +49,12 @@ public class ColaboradorController {
                 .map(dtos -> ResponseEntity.ok(
                         dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
                                 .id(dto.getId())
+                                .idCompetencia(dto.getIdCompetencia())
                                 .nome(dto.getNome())
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
                                 .ordem(dto.getOrdem())
+                                .certificado(dto.getCertificado())
                                 .build())
                                 .toList()
                 ))
@@ -74,7 +72,7 @@ public class ColaboradorController {
 
         List<ColaboradorCompetenciaUpdateItemDTO> items = request.getItems().stream()
                 .map(vm -> new ColaboradorCompetenciaUpdateItemDTO(
-                        vm.getCompetenciaId(), vm.getProeficiencia(), vm.getOrdem()
+                        vm.getCompetenciaId(), vm.getProeficiencia(), vm.getOrdem(), vm.getCertificado()
                 ))
                 .toList();
 
@@ -82,10 +80,12 @@ public class ColaboradorController {
                 .map(dtos -> ResponseEntity.ok(
                         dtos.stream().map(dto -> ColaboradorCompetenciaResponseViewModel.builder()
                                 .id(dto.getId())
+                                .idCompetencia(dto.getIdCompetencia())
                                 .nome(dto.getNome())
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
                                 .ordem(dto.getOrdem())
+                                .certificado(dto.getCertificado())
                                 .build())
                                 .toList()
                 ))
@@ -101,6 +101,42 @@ public class ColaboradorController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}/competencias/{idItem}/certificado")
+    public ResponseEntity<byte[]> obterCertificadoCompetencia(@PathVariable Long id, @PathVariable Long idItem) {
+        return colaboradorService.obterCertificadoCompetencia(id, idItem)
+                .map(bytes -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    
+                    MediaType contentType = MediaType.APPLICATION_OCTET_STREAM;
+                    String filename = "certificado";
+                    
+                    if (bytes.length >= 4) {
+                        if (bytes[0] == 0x25 && bytes[1] == 0x50 && bytes[2] == 0x44 && bytes[3] == 0x46) {
+                            contentType = MediaType.APPLICATION_PDF;
+                            filename = "certificado.pdf";
+                        }
+                        else if (bytes[0] == (byte)0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+                            contentType = MediaType.IMAGE_PNG;
+                            filename = "certificado.png";
+                        }
+                        else if (bytes[0] == (byte)0xFF && bytes[1] == (byte)0xD8 && bytes[2] == (byte)0xFF) {
+                            contentType = MediaType.IMAGE_JPEG;
+                            filename = "certificado.jpg";
+                        }
+                        else if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) {
+                            contentType = MediaType.IMAGE_GIF;
+                            filename = "certificado.gif";
+                        }
+                    }
+                    
+                    headers.setContentType(contentType);
+                    headers.setContentLength(bytes.length);
+                    headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"");
+                    return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public ResponseEntity<List<ColaboradorListResponseViewModel>> listarColaboradores() {
         List<ColaboradorListResponseViewModel> colaboradores = colaboradorService.listarTodosColaboradores()
@@ -112,7 +148,7 @@ public class ColaboradorController {
                         .email(dto.getEmail())
                         .dataNascimento(dto.getDataNascimento())
                         .genero(dto.getGenero())
-                        .role(dto.getRole() != null ? dto.getRole().name() : null)
+                        .role(dto.getRole() != null ? dto.getRole().getValue() : null)
                         .cargoNome(dto.getNomeCargo())
                         .idEquipe(dto.getIdEquipe())
                         .idSetor(dto.getIdSetor())
@@ -178,10 +214,12 @@ public class ColaboradorController {
         novo.setSobrenome(req.getSobrenome());
         novo.setEmail(req.getEmail());
         novo.setSenha(passwordEncoder.encode(req.getSenha()));
+        if (req.getDataNascimento() != null) {
+            novo.setDataNascimento(req.getDataNascimento());
+        }
         if (req.getGenero() != null) {
             try { novo.setGenero(GeneroEnum.valueOf(req.getGenero())); } catch (Exception ignored) {}
         }
-        try { novo.setRole(ColaboradorRoleEnum.valueOf(req.getRole())); } catch (Exception ignored) { novo.setRole(ColaboradorRoleEnum.Colaborador); }
         novo.setStatus(req.getStatus() != null ? req.getStatus() : true);
         novo.setCargo(cargo);
         novo.setEquipe(equipe);
@@ -192,8 +230,9 @@ public class ColaboradorController {
                 .nome(salvo.getNome())
                 .sobrenome(salvo.getSobrenome())
                 .email(salvo.getEmail())
+                .dataNascimento(salvo.getDataNascimento())
                 .genero(salvo.getGenero())
-                .role(salvo.getRole() != null ? salvo.getRole().name() : null)
+                .role(salvo.getRole() != null ? salvo.getRole().getValue() : null)
                 .cargoNome(salvo.getCargo() != null ? salvo.getCargo().getNome() : null)
                 .idEquipe(salvo.getEquipe() != null ? salvo.getEquipe().getId() : null)
                 .idSetor(salvo.getEquipe() != null && salvo.getEquipe().getSetor() != null ? salvo.getEquipe().getSetor().getId() : null)
@@ -225,27 +264,27 @@ public class ColaboradorController {
     }
 
     private ColaboradorPerfilResponseViewModel mapToVM(ColaboradorPerfilDTO dto) {
-        ColaboradorPerfilResponseViewModel.CargoVM cargoVM = null;
+        CargoResponseViewModel cargoVM = null;
         if (dto.getCargo() != null) {
-            cargoVM = ColaboradorPerfilResponseViewModel.CargoVM.builder()
+            cargoVM = CargoResponseViewModel.builder()
                     .id_cargo(dto.getCargo().getId())
                     .nome_cargo(dto.getCargo().getNome())
                     .desc_cargo(dto.getCargo().getDescricao())
                     .status(dto.getCargo().getStatus())
                     .build();
         }
-        ColaboradorPerfilResponseViewModel.SetorVM setorVM = null;
+        SetorSimpleViewModel setorVM = null;
         if (dto.getEquipe() != null && dto.getEquipe().getSetor() != null) {
-            setorVM = ColaboradorPerfilResponseViewModel.SetorVM.builder()
+            setorVM = SetorSimpleViewModel.builder()
                     .id_setor(dto.getEquipe().getSetor().getId())
                     .nome_setor(dto.getEquipe().getSetor().getNome())
                     .desc_setor(dto.getEquipe().getSetor().getDescricao())
                     .status(dto.getEquipe().getSetor().getStatus())
                     .build();
         }
-        ColaboradorPerfilResponseViewModel.EquipeVM equipeVM = null;
+        EquipeSimpleViewModel equipeVM = null;
         if (dto.getEquipe() != null) {
-            equipeVM = ColaboradorPerfilResponseViewModel.EquipeVM.builder()
+            equipeVM = EquipeSimpleViewModel.builder()
                     .id_equipe(dto.getEquipe().getId())
                     .nome_equipe(dto.getEquipe().getNome())
                     .status(dto.getEquipe().getStatus())
@@ -254,23 +293,24 @@ public class ColaboradorController {
                     .build();
         }
 
-        List<ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM> comps = new ArrayList<>();
+        List<ColaboradorCompetenciaFullViewModel> comps = new ArrayList<>();
         if (dto.getCompetencias() != null) {
             for (var cc : dto.getCompetencias()) {
-                ColaboradorPerfilResponseViewModel.CompetenciaItemVM compVM = null;
+                CompetenciaItemViewModel compVM = null;
                 if (cc.getCompetencia() != null) {
-                    compVM = ColaboradorPerfilResponseViewModel.CompetenciaItemVM.builder()
+                    compVM = CompetenciaItemViewModel.builder()
                             .id_competencia(cc.getCompetencia().getId())
                             .nome(cc.getCompetencia().getNome())
                             .tipo(cc.getCompetencia().getTipo())
                             .build();
                 }
-                comps.add(ColaboradorPerfilResponseViewModel.ColaboradorCompetenciaFullVM.builder()
+                comps.add(ColaboradorCompetenciaFullViewModel.builder()
                         .id(cc.getId())
                         .id_colaborador(dto.getId())
                         .id_competencia(cc.getCompetenciaId())
                         .proeficiencia(cc.getProeficiencia())
                         .ordem(cc.getOrdem())
+                        .certificado(cc.getCertificado())
                         .competencia(compVM)
                         .build());
             }
@@ -283,6 +323,7 @@ public class ColaboradorController {
                 .email(dto.getEmail())
                 .status(dto.getStatus())
                 .role(dto.getRole())
+                .data_nasci(dto.getDataNascimento() != null ? dto.getDataNascimento().toString() : null)
                 .criado_em(dto.getCriadoEm() != null ? dto.getCriadoEm().toString() : null)
                 .atualizado_em(dto.getAtualizadoEm() != null ? dto.getAtualizadoEm().toString() : null)
                 .avatar(dto.getAvatar() != null ? Base64.getEncoder().encodeToString(dto.getAvatar()) : null)

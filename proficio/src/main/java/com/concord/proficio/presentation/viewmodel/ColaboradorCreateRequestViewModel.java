@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 public class ColaboradorCreateRequestViewModel {
@@ -19,15 +20,14 @@ public class ColaboradorCreateRequestViewModel {
 
     private String genero;
 
-    @NotBlank
-    private String role;
-
     @NotNull
     private Long idEquipe;
     @NotNull
     private Long idCargo;
 
     private Boolean status;
+
+    private LocalDate dataNascimento;
 }
 
 

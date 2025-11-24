@@ -9,14 +9,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColaboradorCompetenciaDTO {
+public class SquadDTO {
     private Long id;
-    private Long idCompetencia;
     private String nome;
-    private Byte tipo;
-    private Integer proeficiencia;
-    private Integer ordem;
-    private Boolean certificado;
+    private String descricao;
+    private Boolean status;
+    private Long liderId;
+    private Long membrosCount;
 }
+
+
+
 
 

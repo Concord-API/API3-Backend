@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
+import java.util.Base64;
 
 @Service
 public class ColaboradorService {
@@ -44,11 +45,13 @@ public class ColaboradorService {
         List<ColaboradorCompetencia> competencias = colaboradorCompetenciaRepository.findByColaboradorIdAndStatusTrue(colaboradorId);
         List<ColaboradorCompetenciaDTO> dtos = competencias.stream()
                 .map(cc -> ColaboradorCompetenciaDTO.builder()
-                        .id(cc.getCompetencia().getId())
+                        .id(cc.getId())
+                        .idCompetencia(cc.getCompetencia().getId())
                         .nome(cc.getCompetencia().getNome())
                         .tipo(cc.getCompetencia().getTipo())
                         .proeficiencia(cc.getProeficiencia())
                         .ordem(cc.getOrdem())
+                        .certificado(cc.getCertificado() != null && cc.getCertificado().length > 0)
                         .build())
                 .collect(Collectors.toList());
         return Optional.of(dtos);
@@ -66,6 +69,8 @@ public class ColaboradorService {
             Long compId = item.getCompetenciaId();
             Integer proef = item.getProeficiencia();
             Integer ordem = item.getOrdem();
+            String certificadoBase64 = item.getCertificado();
+            byte[] certificadoBytes = decodeDataUrlToBytes(certificadoBase64);
 
             Competencia competencia = competenciaRepository.findById(compId)
                     .orElseThrow(() -> new IllegalArgumentException("Competencia não encontrada: " + compId));
@@ -77,6 +82,7 @@ public class ColaboradorService {
                 ColaboradorCompetencia cc = existente.get();
                 if (proef != null) cc.setProeficiencia(proef);
                 if (ordem != null) cc.setOrdem(ordem);
+                if (certificadoBytes != null) cc.setCertificado(certificadoBytes);
                 cc.setStatus(true);
                 colaboradorCompetenciaRepository.save(cc);
             } else {
@@ -85,12 +91,38 @@ public class ColaboradorService {
                 novo.setCompetencia(competencia);
                 novo.setProeficiencia(proef != null ? proef : 0);
                 novo.setOrdem(ordem);
+                if (certificadoBytes != null) novo.setCertificado(certificadoBytes);
                 novo.setStatus(true);
                 colaboradorCompetenciaRepository.save(novo);
             }
         }
 
         return listarCompetenciasDTO(colaboradorId);
+    }
+
+    public Optional<byte[]> obterCertificadoCompetencia(Long colaboradorId, Long colaboradorCompetenciaId) {
+        Optional<ColaboradorCompetencia> optional = colaboradorCompetenciaRepository.findById(colaboradorCompetenciaId);
+        if (optional.isEmpty()) return Optional.empty();
+        ColaboradorCompetencia cc = optional.get();
+        if (cc.getColaborador() == null || !colaboradorId.equals(cc.getColaborador().getId())) {
+            return Optional.empty();
+        }
+        if (cc.getCertificado() == null || cc.getCertificado().length == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(cc.getCertificado());
+    }
+
+    private byte[] decodeDataUrlToBytes(String maybeDataUrl) {
+        if (maybeDataUrl == null || maybeDataUrl.isBlank()) return null;
+        try {
+            String raw = maybeDataUrl.trim();
+            int commaIdx = raw.indexOf(',');
+            String base64 = (raw.startsWith("data:") && commaIdx > 0) ? raw.substring(commaIdx + 1) : raw;
+            return Base64.getDecoder().decode(base64);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Transactional
@@ -221,6 +253,7 @@ public class ColaboradorService {
                         .competenciaId(cc.getCompetencia() != null ? cc.getCompetencia().getId() : null)
                         .proeficiencia(cc.getProeficiencia())
                         .ordem(cc.getOrdem())
+                        .certificado(cc.getCertificado() != null && cc.getCertificado().length > 0)
                         .competencia(cc.getCompetencia() == null ? null : ColaboradorPerfilDTO.CompetenciaItem.builder()
                                 .id(cc.getCompetencia().getId())
                                 .nome(cc.getCompetencia().getNome())
@@ -235,7 +268,8 @@ public class ColaboradorService {
                 .sobrenome(colab.getSobrenome())
                 .email(colab.getEmail())
                 .status(colab.getStatus())
-                .role(colab.getRole() != null ? colab.getRole().name() : null)
+                .role(colab.getRole() != null ? colab.getRole().getValue() : null)
+                    .dataNascimento(colab.getDataNascimento())
                 .criadoEm(colab.getCriadoEm())
                 .atualizadoEm(colab.getAtualizadoEm())
                 .avatar(colab.getAvatar())

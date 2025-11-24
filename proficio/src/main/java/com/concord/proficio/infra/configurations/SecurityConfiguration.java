@@ -74,6 +74,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/colaboradores/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/colaboradores").hasAnyRole("Gestor","Diretor")
                         .requestMatchers(HttpMethod.POST, "/api/colaboradores").hasAnyRole("Gestor","Diretor")
+                        .requestMatchers(HttpMethod.GET, "/api/avaliacoes/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

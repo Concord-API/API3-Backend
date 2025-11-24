@@ -4,7 +4,6 @@ import com.concord.proficio.presentation.viewmodel.AuthRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.AuthResponseViewModel;
 import com.concord.proficio.presentation.viewmodel.UserPayloadViewModel;
 import com.concord.proficio.domain.entities.Colaborador;
-import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import com.concord.proficio.infra.security.JwtTokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,11 +27,7 @@ public class AuthController {
     @Autowired
     private JwtTokenService jwtTokenService;
 
-    @Autowired
-    private ColaboradorRepository colaboradorRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseViewModel> login(@Valid @RequestBody AuthRequestViewModel request) {
@@ -47,7 +41,7 @@ public class AuthController {
                 String.valueOf(principal.getId()),
                 (principal.getNome() + " " + principal.getSobrenome()).trim(),
                 principal.getEmail(),
-                principal.getRole().name()
+                principal.getRole().getValue()
         );
         return ResponseEntity.ok(new AuthResponseViewModel(token, payload));
     }
