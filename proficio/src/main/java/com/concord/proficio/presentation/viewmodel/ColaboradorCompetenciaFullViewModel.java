@@ -15,5 +15,6 @@ public class ColaboradorCompetenciaFullViewModel {
     private Long id_competencia;
     private Integer proeficiencia;
     private Integer ordem;
+    private Boolean certificado;
     private CompetenciaItemViewModel competencia;
 }

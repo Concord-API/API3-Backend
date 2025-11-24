@@ -15,7 +15,6 @@ public class AvaliacaoColaboradorCreateRequestViewModel {
 
     private Integer nota;
 
-    @NotNull(message = "ID da competência é obrigatório")
     private Long competenciaId;
 
     private Boolean status;

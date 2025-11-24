@@ -15,6 +15,7 @@ public class ColaboradorCompetenciaResponseViewModel {
     private Boolean aprovada;
     private Integer proeficiencia;
     private Integer ordem;
+    private Boolean certificado;
 }
 
 

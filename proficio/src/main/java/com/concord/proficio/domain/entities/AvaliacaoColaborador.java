@@ -48,7 +48,7 @@ public class AvaliacaoColaborador {
 	private Integer nota;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_competencia", nullable = false)
+	@JoinColumn(name = "id_competencia", nullable = true)
 	private Competencia competencia;
 
 	@Column(name = "status", length = 1)

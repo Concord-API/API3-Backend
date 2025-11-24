@@ -82,6 +82,10 @@ public class ColaboradorPerfilDTO {
         private Long competenciaId;
         private Integer proeficiencia;
         private Integer ordem;
+        /**
+         * Indica se existe certificado anexado para esta competência do colaborador.
+         */
+        private Boolean certificado;
         private CompetenciaItem competencia;
     }
 }

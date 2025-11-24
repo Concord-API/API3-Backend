@@ -40,7 +40,7 @@ public class ColaboradorCompetencia {
 	private Integer ordem;
 
 	@Lob
-	@Column(name = "certificado")
+	@Column(name = "certificado", columnDefinition = "LONGBLOB")
 	private byte[] certificado;
 
 	@Column(name = "status", length = 1)

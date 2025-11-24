@@ -13,6 +13,9 @@ import com.concord.proficio.infra.repositories.EquipeRepository;
 import com.concord.proficio.infra.repositories.ColaboradorRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import java.util.*;
 import com.concord.proficio.application.dto.ColaboradorPerfilDTO;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +54,7 @@ public class ColaboradorController {
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
                                 .ordem(dto.getOrdem())
+                                .certificado(dto.getCertificado())
                                 .build())
                                 .toList()
                 ))
@@ -68,7 +72,7 @@ public class ColaboradorController {
 
         List<ColaboradorCompetenciaUpdateItemDTO> items = request.getItems().stream()
                 .map(vm -> new ColaboradorCompetenciaUpdateItemDTO(
-                        vm.getCompetenciaId(), vm.getProeficiencia(), vm.getOrdem()
+                        vm.getCompetenciaId(), vm.getProeficiencia(), vm.getOrdem(), vm.getCertificado()
                 ))
                 .toList();
 
@@ -81,6 +85,7 @@ public class ColaboradorController {
                                 .tipo(dto.getTipo())
                                 .proeficiencia(dto.getProeficiencia())
                                 .ordem(dto.getOrdem())
+                                .certificado(dto.getCertificado())
                                 .build())
                                 .toList()
                 ))
@@ -94,6 +99,42 @@ public class ColaboradorController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/competencias/{idItem}/certificado")
+    public ResponseEntity<byte[]> obterCertificadoCompetencia(@PathVariable Long id, @PathVariable Long idItem) {
+        return colaboradorService.obterCertificadoCompetencia(id, idItem)
+                .map(bytes -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    
+                    MediaType contentType = MediaType.APPLICATION_OCTET_STREAM;
+                    String filename = "certificado";
+                    
+                    if (bytes.length >= 4) {
+                        if (bytes[0] == 0x25 && bytes[1] == 0x50 && bytes[2] == 0x44 && bytes[3] == 0x46) {
+                            contentType = MediaType.APPLICATION_PDF;
+                            filename = "certificado.pdf";
+                        }
+                        else if (bytes[0] == (byte)0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+                            contentType = MediaType.IMAGE_PNG;
+                            filename = "certificado.png";
+                        }
+                        else if (bytes[0] == (byte)0xFF && bytes[1] == (byte)0xD8 && bytes[2] == (byte)0xFF) {
+                            contentType = MediaType.IMAGE_JPEG;
+                            filename = "certificado.jpg";
+                        }
+                        else if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) {
+                            contentType = MediaType.IMAGE_GIF;
+                            filename = "certificado.gif";
+                        }
+                    }
+                    
+                    headers.setContentType(contentType);
+                    headers.setContentLength(bytes.length);
+                    headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"");
+                    return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
@@ -269,6 +310,7 @@ public class ColaboradorController {
                         .id_competencia(cc.getCompetenciaId())
                         .proeficiencia(cc.getProeficiencia())
                         .ordem(cc.getOrdem())
+                        .certificado(cc.getCertificado())
                         .competencia(compVM)
                         .build());
             }
