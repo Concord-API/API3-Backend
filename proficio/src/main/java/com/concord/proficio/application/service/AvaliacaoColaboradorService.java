@@ -38,8 +38,11 @@ public class AvaliacaoColaboradorService {
         Colaborador avaliado = colaboradorRepository.findById(avaliadoId)
                 .orElseThrow(() -> new IllegalArgumentException("Avaliado não encontrado com ID: " + avaliadoId));
         
-        Competencia competencia = competenciaRepository.findById(competenciaId)
-                .orElseThrow(() -> new IllegalArgumentException("Competência não encontrada com ID: " + competenciaId));
+        Competencia competencia = null;
+        if (competenciaId != null) {
+            competencia = competenciaRepository.findById(competenciaId)
+                    .orElseThrow(() -> new IllegalArgumentException("Competência não encontrada com ID: " + competenciaId));
+        }
 
         AvaliacaoColaborador avaliacao = new AvaliacaoColaborador();
         avaliacao.setAvaliador(avaliador);

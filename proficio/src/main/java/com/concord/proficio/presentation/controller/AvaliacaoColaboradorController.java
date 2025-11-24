@@ -3,7 +3,6 @@ package com.concord.proficio.presentation.controller;
 import com.concord.proficio.application.dto.AvaliacaoColaboradorDTO;
 import com.concord.proficio.application.service.AvaliacaoColaboradorService;
 import com.concord.proficio.domain.entities.Colaborador;
-import com.concord.proficio.domain.enums.ColaboradorRoleEnum;
 import com.concord.proficio.presentation.viewmodel.AvaliacaoColaboradorCreateRequestViewModel;
 import com.concord.proficio.presentation.viewmodel.AvaliacaoColaboradorResponseViewModel;
 import com.concord.proficio.presentation.viewmodel.AvaliacaoColaboradorUpdateRequestViewModel;
@@ -69,13 +68,7 @@ public class AvaliacaoColaboradorController {
 
         Colaborador colaboradorLogado = (Colaborador) authentication.getPrincipal();
         
-        List<AvaliacaoColaboradorDTO> dtos;
-        
-        if (ColaboradorRoleEnum.DIRETOR.equals(colaboradorLogado.getRole())) {
-            dtos = avaliacaoColaboradorService.listarTodas();
-        } else {
-            dtos = avaliacaoColaboradorService.listarPorColaborador(colaboradorLogado.getId());
-        }
+        List<AvaliacaoColaboradorDTO> dtos = avaliacaoColaboradorService.listarPorColaborador(colaboradorLogado.getId());
         
         List<AvaliacaoColaboradorResponseViewModel> vms = dtos.stream()
                 .map(this::mapToViewModel)

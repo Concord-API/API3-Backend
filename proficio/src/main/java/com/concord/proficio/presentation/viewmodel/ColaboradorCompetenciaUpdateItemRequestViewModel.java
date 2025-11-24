@@ -13,6 +13,8 @@ public class ColaboradorCompetenciaUpdateItemRequestViewModel {
     private Integer proeficiencia;
 
     private Integer ordem;
+
+    private String certificado;
 }
 
 

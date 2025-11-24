@@ -16,6 +16,7 @@ public class ColaboradorCompetenciaDTO {
     private Byte tipo;
     private Integer proeficiencia;
     private Integer ordem;
+    private Boolean certificado;
 }
 
 

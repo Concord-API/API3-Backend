@@ -11,6 +11,7 @@ public class ColaboradorCompetenciaUpdateItemDTO {
     private Long competenciaId;
     private Integer proeficiencia;
     private Integer ordem;
+    private String certificado;
 }
 
 

@@ -32,4 +32,7 @@ public class Competencia {
 
 	@Column(name = "aprovada", nullable = false)
 	private Boolean aprovada = false;
+
+	@Column(name = "certificado", columnDefinition = "LONGBLOB")
+	private byte[] certificado;
 }
