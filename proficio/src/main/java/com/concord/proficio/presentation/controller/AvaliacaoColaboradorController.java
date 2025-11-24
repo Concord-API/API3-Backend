@@ -77,6 +77,24 @@ public class AvaliacaoColaboradorController {
         return ResponseEntity.ok(vms);
     }
 
+    @GetMapping("/feitas")
+    public ResponseEntity<List<AvaliacaoColaboradorResponseViewModel>> listarAvaliacoesFeitas() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Colaborador colaboradorLogado = (Colaborador) authentication.getPrincipal();
+        
+        List<AvaliacaoColaboradorDTO> dtos = avaliacaoColaboradorService.listarPorAvaliador(colaboradorLogado.getId());
+        
+        List<AvaliacaoColaboradorResponseViewModel> vms = dtos.stream()
+                .map(this::mapToViewModel)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(vms);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AvaliacaoColaboradorResponseViewModel> buscarPorId(@PathVariable Long id) {
         return avaliacaoColaboradorService.buscarPorId(id)

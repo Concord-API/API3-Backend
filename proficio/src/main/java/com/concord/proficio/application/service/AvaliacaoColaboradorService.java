@@ -106,6 +106,13 @@ public class AvaliacaoColaboradorService {
                 .collect(Collectors.toList());
     }
 
+    public List<AvaliacaoColaboradorDTO> listarPorAvaliador(Long avaliadorId) {
+        List<AvaliacaoColaborador> avaliacoes = avaliacaoColaboradorRepository.findByAvaliadorIdAndStatusTrue(avaliadorId);
+        return avaliacoes.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<AvaliacaoColaboradorDTO> listarTodas() {
         List<AvaliacaoColaborador> avaliacoes = avaliacaoColaboradorRepository.findAll();
         return avaliacoes.stream()
